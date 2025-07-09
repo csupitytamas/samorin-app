@@ -23,19 +23,52 @@ class Arena(models.Model):
 class PoleLocation(models.Model):
     pole = models.ForeignKey(Pole, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    warehouse = models.ForeignKey(Warehouse, null=True, blank=True, on_delete=models.SET_NULL)
     arena = models.ForeignKey('Arena', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         location = self.arena.name if self.arena else self.warehouse.name
         return f"{self.pole} x {self.quantity} @ {location}"
 
+    def delete(self, *args, **kwargs):
+        # warehouse készlet visszaállítása
+        if self.pole:
+            self.pole.number += self.quantity
+            self.pole.save()
+        super().delete(*args, **kwargs)
+
 class WingLocation(models.Model):
     wing = models.ForeignKey(Wings, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    warehouse = models.ForeignKey(Warehouse, null=True, blank=True, on_delete=models.SET_NULL)
     arena = models.ForeignKey('Arena', null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         location = self.arena.name if self.arena else self.warehouse.name
         return f"{self.wing} x {self.quantity} @ {location}"
+
+    def delete(self, *args, **kwargs):
+        if self.wing:
+            self.wing.number += self.quantity
+            self.wing.save()
+        super().delete(*args, **kwargs)
+
+
+class ArchivedEvent(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    closed_at = models.DateTimeField(auto_now_add=True)
+
+class ArchivedArena(models.Model):
+    archived_event = models.ForeignKey(ArchivedEvent, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+class ArchivedPoleLocation(models.Model):
+    archived_arena = models.ForeignKey(ArchivedArena, on_delete=models.CASCADE)
+    pole_name = models.CharField(max_length=100)
+    color = models.CharField(max_length=50)
+    length = models.FloatField()
+    quantity = models.PositiveIntegerField()
+
+class ArchivedWingLocation(models.Model):
+    archived_arena = models.ForeignKey(ArchivedArena, on_delete=models.CASCADE)
+    wing_name = models.CharField(max_length=100)
+    color = models.CharField(max_length=50)
+    quantity = models.PositiveIntegerField()

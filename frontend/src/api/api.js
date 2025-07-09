@@ -45,3 +45,40 @@ export function fetchPoleLocationsByArena(arenaId) {
 export function fetchWingLocationsByArena(arenaId) {
   return axios.get(`http://localhost:8000/api/wing-locations/?arena=${arenaId}`);
 }
+
+export function fetchEventDetails(id) {
+  return axios.get(API_BASE + `events/${id}/full_details/`);
+}
+
+export function fetchEvent(id) {
+  return axios.get(API_BASE + 'events/' + id + '/');
+}
+
+export function deletePoleLocation(id) {
+  return axios.delete(API_BASE + `pole-locations/${id}/`);
+}
+export function deleteWingsLocation(id) {
+  return axios.delete(API_BASE + `wing-locations/${id}/`);
+}
+
+export function deleteEvent(eventId) {
+  return axios.delete(API_BASE + 'events/' + eventId + '/');
+}
+export function updateEvent(eventId, data) {
+  return axios.put(API_BASE + 'events/' + eventId + '/', data);
+}
+export function updateArena(arenaId, data) {
+  return axios.patch( API_BASE + `arenas/${arenaId}/`, data);
+}
+export function createWishlist(data) {
+  return axios.post(API_BASE + 'wishlist/', data);
+}
+export function archiveEvent(eventId) {
+  return axios.post(API_BASE + `events/${eventId}/archive/`);
+}
+export function fetchArchivedEvents() {
+  return axios.get(API_BASE + 'archived-events/');
+}
+export function fetchArchivedEventDetails(id) {
+  return axios.get(API_BASE + 'archived-events/' + id + '/');
+}

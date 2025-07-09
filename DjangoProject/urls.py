@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('events.urls')),
     path('api/', include('warehouse.urls')),
+    path('api/', include('wishlist.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

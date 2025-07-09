@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'events',
     'rest_framework',
     'corsheaders',
+    'wishlist',
 ]
 
 MIDDLEWARE = [
