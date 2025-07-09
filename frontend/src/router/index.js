@@ -8,6 +8,13 @@ import EventEdit from "@/components/EventEdit.vue";
 import WishList from "@/components/WishList.vue";
 import ArchivedEventDetails from "@/components/ArchivedEventDetails.vue";
 import ArchivedEvents from "@/components/ArchivedEvents.vue";
+import RegisterForm from "@/components/RegisterForm.vue";
+import LoginForm from "@/components/LoginForm.vue";
+import AdminDashboard from "@/components/AdminDashboard.vue"
+import UserAdmin from "@/components/UserAdmin.vue"
+import PoleCreate from "@/components/PoleCreate.vue"
+import WingsCreate from "@/components/WingsCreate.vue"
+import Profile from "@/components/Profile.vue";
 
 const routes = [
     {
@@ -48,23 +55,16 @@ const routes = [
     component: EventDetails,
     props: true
   },
-  {
-    path: '/wishlist/:arenaId?',
-    name: 'wishlist',
-    component: WishList,
-    props: true
-  },
-  {
-    path: '/archived-events/:id/details',
-    name: 'archived-event-details',
-    component: ArchivedEventDetails,
-    props: true
-  },
-    {
-  path: '/archived-events',
-  name: 'archived-events',
-  component: ArchivedEvents
-}
+  { path: '/wishlist/:arenaId?', name: 'wishlist', component: WishList, props: true},
+  { path: '/archived-events/:id/details', name: 'archived-event-details', component: ArchivedEventDetails, props: true},
+  { path: '/archived-events', name: 'archived-events', component: ArchivedEvents},
+  { path: '/register', name: 'register', component: RegisterForm},
+  { path: '/login', name: 'login', component: LoginForm},
+  { path: '/admin', name: 'admin-dashboard', component: AdminDashboard },
+  { path: '/admin/users', name: 'user-admin', component: UserAdmin },
+  { path: '/admin/pole', name: 'pole-create', component: PoleCreate },
+  { path: '/admin/wings', name: 'wings-create', component: WingsCreate },
+  { path: '/profile', name: 'profile', component: Profile }
 
 
 ]

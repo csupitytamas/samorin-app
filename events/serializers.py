@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from users.models import UserProfile
 from .models import Event, Arena, PoleLocation, WingLocation, ArchivedEvent, ArchivedArena, ArchivedWingLocation, \
     ArchivedPoleLocation
 from warehouse.models import Pole, Wings
@@ -134,3 +136,12 @@ class ArchivedEventDetailSerializer(serializers.ModelSerializer):
     def get_arenas(self, obj):
         arenas = ArchivedArena.objects.filter(archived_event=obj)
         return ArchivedArenaSerializer(arenas, many=True).data
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.CharField(source='user.email', read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'user', 'username', 'email', 'role']
+

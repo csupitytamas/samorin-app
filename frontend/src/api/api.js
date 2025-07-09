@@ -1,5 +1,61 @@
-import axios from 'axios';
 
+import axios from 'axios'
+
+// Interceptor for requests (always send the access token)
+axios.interceptors.request.use(config => {
+  const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+// Interceptor for responses (auto-refresh on 401)
+axios.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config
+
+    // If access token expired (401), and we haven't retried yet
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+      const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token')
+      if (refreshToken) {
+        try {
+          // Request a new access token with the refresh token
+          const res = await axios.post('/api/token/refresh/', { refresh: refreshToken })
+          const newAccess = res.data.access
+
+          // Save new access token (same storage as refresh)
+          if (localStorage.getItem('refresh_token')) {
+            localStorage.setItem('access_token', newAccess)
+          } else {
+            sessionStorage.setItem('access_token', newAccess)
+          }
+          // Set header for the new request
+          originalRequest.headers['Authorization'] = `Bearer ${newAccess}`
+          // Retry the original request with new token
+          return axios(originalRequest)
+        } catch (refreshError) {
+          // If refresh fails (refresh token expired), log out
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
+          sessionStorage.removeItem('access_token')
+          sessionStorage.removeItem('refresh_token')
+          // Optionally redirect to login page
+          window.location.href = '/login'
+        }
+      } else {
+        // No refresh token: redirect to login
+        window.location.href = '/login'
+      }
+    }
+    // If other error, just reject
+    return Promise.reject(error)
+  }
+
+
+)
 const API_BASE = 'http://localhost:8000/api/';
 
 // EVENTS
@@ -81,4 +137,40 @@ export function fetchArchivedEvents() {
 }
 export function fetchArchivedEventDetails(id) {
   return axios.get(API_BASE + 'archived-events/' + id + '/');
+}
+export function registerUser(data) {
+  return axios.post(API_BASE + 'users/register/', data)
+}
+export function loginUser(data) {
+  return axios.post(API_BASE + 'token/', data)
+}
+export function fetchProfile() {
+  return axios.get(API_BASE + 'users/me/').then(r => r.data)
+}
+export function fetchWishlists() {
+  return axios.get(API_BASE + 'wishlist/').then(r => r.data)
+}
+export function logoutUser() {
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
+  sessionStorage.removeItem('access_token')
+  sessionStorage.removeItem('refresh_token')
+}
+
+export function fetchUsers() {
+  return axios.get(API_BASE + 'users/userprofiles/').then(r => r.data)
+}
+
+export function updateUserRole(id, data) {
+  return axios.patch(API_BASE + `users/userprofiles/${id}/`, data)
+}
+export function fetchWarehouses() {
+  return axios.get(API_BASE + 'warehouses/').then(r => r.data)
+}
+export function createPole(data) {
+  return axios.post(API_BASE + 'poles/', data)
+}
+
+export function createWings(data) {
+  return axios.post(API_BASE + 'wings/', data)
 }

@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
@@ -8,8 +8,10 @@ from .serializers import EventSerializer, ArenaSerializer, PoleLocationSerialize
     ArchivedEventDetailSerializer
 from django.utils import timezone
 from .models import ArchivedEvent, ArchivedArena, ArchivedPoleLocation, ArchivedWingLocation
+from .permissions import IsAdminOrReadOnly, IsCrewOrAdmin, IsChiefOrAdmin
 
 class EventViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Event.objects.filter(is_active=True)
     serializer_class = EventSerializer
 
@@ -71,6 +73,7 @@ class EventViewSet(viewsets.ModelViewSet):
         return Response({'detail': 'Event archived, all stock returned to warehouse.'})
 
 class ArenaViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsCrewOrAdmin]
     queryset = Arena.objects.all()
     serializer_class = ArenaSerializer
 
@@ -89,9 +92,12 @@ class WingLocationViewSet(viewsets.ModelViewSet):
 
 
 class ArchivedEventDetailView(RetrieveAPIView):
+    permission_classes = [IsCrewOrAdmin]
     queryset = ArchivedEvent.objects.all()
     serializer_class = ArchivedEventDetailSerializer
 
 class ArchivedEventViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsCrewOrAdmin]
     queryset = ArchivedEvent.objects.all()
     serializer_class = ArchivedEventDetailSerializer
+

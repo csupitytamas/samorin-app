@@ -122,8 +122,8 @@ export default {
 
       axios.post('http://localhost:8000/api/wishlist/', {
         arena: this.selectedArena,
-        pole_items,
-        wing_items
+        pole_items_input: pole_items,   // ezt!
+        wing_items_input: wing_items    // ezt!
       })
       .then(() => {
         this.successMessage = "Wishlist saved!";
