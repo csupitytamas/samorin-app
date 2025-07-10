@@ -1,23 +1,23 @@
 <template>
   <div>
-    <h2>Edit Arena</h2>
+    <h2>{{ t('editArena') }}</h2>
 
     <!-- ALREADY ASSIGNED POLES -->
-    <h3>Assigned Poles</h3>
+    <h3>{{ t('assignedPoles') }}</h3>
     <table border="1" cellpadding="6" style="margin-bottom:1.5rem; min-width:500px;">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Color</th>
-          <th>Length (m)</th>
-          <th>Quantity</th>
-          <th>Image</th>
-          <th>Delete</th>
+          <th>{{ t('name') }}</th>
+          <th>{{ t('color') }}</th>
+          <th>{{ t('length') }}</th>
+          <th>{{ t('quantity') }}</th>
+          <th>{{ t('image') }}</th>
+          <th>{{ t('delete') }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="poleLoc in assignedPoles" :key="poleLoc.id">
-          <td>{{ poleLoc.pole.name_en }}</td>
+          <td>{{ lang === 'hu' ? poleLoc.pole.name_hu : poleLoc.pole.name_en }}</td>
           <td>{{ poleLoc.pole.color }}</td>
           <td>{{ poleLoc.pole.length }}</td>
           <td>{{ poleLoc.quantity }}</td>
@@ -25,40 +25,40 @@
             <img v-if="poleLoc.pole.picture" :src="fullImageUrl(poleLoc.pole.picture)" alt="Pole" style="max-width:60px; max-height:60px;">
           </td>
           <td>
-            <button @click="deletePoleLoc(poleLoc)">Delete</button>
+            <button @click="deletePoleLoc(poleLoc)">{{ t('delete') }}</button>
           </td>
         </tr>
         <tr v-if="assignedPoles.length === 0">
-          <td colspan="6" style="color:gray; text-align:center;">No poles assigned yet</td>
+          <td colspan="6" style="color:gray; text-align:center;">{{ t('noPoles') }}</td>
         </tr>
       </tbody>
     </table>
 
-    <h3>Assigned Wings</h3>
+    <h3>{{ t('assignedWings') }}</h3>
     <table border="1" cellpadding="6" style="margin-bottom:1.5rem; min-width:400px;">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Color</th>
-          <th>Quantity</th>
-          <th>Image</th>
-          <th>Delete</th>
+          <th>{{ t('name') }}</th>
+          <th>{{ t('color') }}</th>
+          <th>{{ t('quantity') }}</th>
+          <th>{{ t('image') }}</th>
+          <th>{{ t('delete') }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="wingLoc in assignedWings" :key="wingLoc.id">
-          <td>{{ wingLoc.wing.name_en }}</td>
+          <td>{{ lang === 'hu' ? wingLoc.wing.name_hu : wingLoc.wing.name_en }}</td>
           <td>{{ wingLoc.wing.color }}</td>
           <td>{{ wingLoc.quantity }}</td>
           <td>
-            <img v-if="wingLoc.wing.picture" :src="fullImageUrl(wingLoc.wing.picture)" alt="Wing" style="max-width:60px; max-height:60px;">
+            <img v-if="wingLoc.wing.picture" :src="fullImageUrl(wingLoc.wing.picture)" alt="Kitörő" style="max-width:60px; max-height:60px;">
           </td>
           <td>
-            <button @click="deleteWingsLoc(wingLoc)">Delete</button>
+            <button @click="deleteWingsLoc(wingLoc)">{{ t('delete') }}</button>
           </td>
         </tr>
         <tr v-if="assignedWings.length === 0">
-          <td colspan="5" style="color:gray; text-align:center;">No wings assigned yet</td>
+          <td colspan="5" style="color:gray; text-align:center;">{{ t('noWings') }}</td>
         </tr>
       </tbody>
     </table>
@@ -69,27 +69,26 @@
 
     <!-- GRID nézet, checkbox-szal és egyszerre assign-nal -->
     <form @submit.prevent="assignGridSelected" style="margin-top: 3rem;">
-      <h3 style="font-weight:bold;">Összes elérhető eszköz (kártyás/grid nézet, keresővel, szűrőkkel, kijelöléssel)</h3>
+      <h3 style="font-weight:bold;">{{ t('availableGrid') }}</h3>
       <div style="margin-bottom: 16px; display: flex; gap: 12px;">
         <input
           v-model="gridSearch"
           type="text"
-          placeholder="Keresés név szerint..."
+          :placeholder="t('searchByName')"
           style="padding:4px 10px; border-radius:4px; border:1px solid #bbb;"
         />
         <select v-model="gridColor" style="padding:4px 10px; border-radius:4px;">
-          <option value="">Minden szín</option>
+          <option value="">{{ t('allColors') }}</option>
           <option v-for="color in gridAvailableColors" :key="color" :value="color">{{ color }}</option>
         </select>
         <select v-model="gridType" style="padding:4px 10px; border-radius:4px;">
-          <option value="">Mindkettő</option>
-          <option value="pole">Pole</option>
-          <option value="wing">Wing</option>
+          <option value="">{{ t('both') }}</option>
+          <option value="pole">{{ t('pole') }}</option>
+          <option value="wing">{{ t('wing') }}</option>
         </select>
-
         <!-- LENGTH FILTER: csak ha pole a típus -->
         <select v-if="gridType === 'pole'" v-model="gridLength" style="padding:4px 10px; border-radius:4px;">
-          <option value="">Minden hossz</option>
+          <option value="">{{ t('allLengths') }}</option>
           <option v-for="len in gridAvailableLengths" :key="len" :value="len">
             {{ len }} m
           </option>
@@ -116,14 +115,16 @@
             style="height: 70px; margin-bottom: 8px; object-fit: contain;"
           />
           <div style="font-weight: bold; margin-bottom: 2px;">
-            {{ item.name_en || item.name_hu }}
+            {{ lang === 'hu' ? item.name_hu : item.name_en }}
           </div>
           <div style="color:#555;">
             {{ item.color }}
             <span v-if="item.length">, {{ item.length }} m</span>
           </div>
-          <div style="font-size:13px; color:#888; margin-bottom:4px;">Típus: {{ item.type }}</div>
-          <div>Készlet: {{ item.number }}</div>
+          <div style="font-size:13px; color:#888; margin-bottom:4px;">
+            {{ t(item.type) }}
+          </div>
+          <div>{{ t('stock') }}: {{ item.number }}</div>
           <!-- Quantity input, ha kijelölve -->
           <div v-if="gridSelected.includes(item.type + '-' + item.id)" style="margin-top:7px;">
             <input
@@ -154,11 +155,11 @@
         </button>
       </div>
       <div v-if="paginatedGridItems.length === 0" style="color:gray; text-align:center; margin-top:1em;">
-        Nincs találat.
+        {{ t('noResults') }}
       </div>
       <div style="text-align:right; margin:24px 0;">
         <button type="submit" :disabled="gridSelected.length === 0">
-          Assign selected to Arena
+          {{ t('assignSelected') }}
         </button>
       </div>
     </form>
@@ -176,6 +177,8 @@ import {
   deleteWingsLocation,
   deletePoleLocation
 } from '@/api/api';
+import { mapState } from 'vuex'
+import translations from '@/translations'
 
 export default {
   name: "ArenaEdit",
@@ -204,28 +207,21 @@ export default {
     }
   },
   computed: {
-    assignablePoles() {
-      const assignedIds = new Set(this.assignedPoles.map(loc => loc.pole.id));
-      return this.poles.filter(pole => !assignedIds.has(pole.id) && pole.number > 0);
+    ...mapState(['lang']),
+    t() {
+      // Rövidítő a fordításhoz
+      return (key) => translations[this.lang]?.[key] || key;
     },
-    assignableWings() {
-      const assignedIds = new Set(this.assignedWings.map(loc => loc.wing.id));
-      return this.wings.filter(wing => !assignedIds.has(wing.id) && wing.number > 0);
-    },
-    // ------- GRID logika -------
     gridAvailableItems() {
-      // Az összes pole+wing, amiből válogat a grid (warehouse, ami > 0)
       return [
         ...this.poles.map(p => ({ ...p, type: 'pole' })),
         ...this.wings.map(w => ({ ...w, type: 'wing' }))
       ].filter(i => i.number > 0)
     },
     gridAvailableColors() {
-      // Egyedi színek
       return [...new Set(this.gridAvailableItems.map(i => i.color).filter(Boolean))];
     },
     gridAvailableLengths() {
-      // Csak pole típushoz!
       return [...new Set(
         this.gridAvailableItems
           .filter(i => i.type === 'pole')
@@ -240,7 +236,6 @@ export default {
         ) &&
         (!this.gridColor || i.color === this.gridColor) &&
         (!this.gridType || i.type === this.gridType) &&
-        // csak pole-nál szűr hosszt
         (!this.gridLength || i.type !== 'pole' || String(i.length) === String(this.gridLength))
       )
     },
@@ -290,7 +285,7 @@ export default {
         });
       }))
       .then(() => {
-        this.successMessage = "Poles assigned!";
+        this.successMessage = this.t('polesAssigned');
         this.errorMessage = "";
         this.selectedPoles = [];
         this.poleQuantities = {};
@@ -311,7 +306,7 @@ export default {
         });
       }))
       .then(() => {
-        this.successMessage = "Wings assigned!";
+        this.successMessage = this.t('wingsAssigned');
         this.errorMessage = "";
         this.selectedWings = [];
         this.wingQuantities = {};
@@ -338,7 +333,6 @@ export default {
         });
     },
     assignGridSelected() {
-      // Kiválasztott pole/wing szétválogatása
       const polesToAssign = [];
       const wingsToAssign = [];
       for (const key of this.gridSelected) {
@@ -365,7 +359,7 @@ export default {
         )
       ])
       .then(() => {
-        this.successMessage = "Assigned selected items!";
+        this.successMessage = this.t('assignedSuccess');
         this.errorMessage = '';
         this.gridSelected = [];
         this.gridQuantities = {};

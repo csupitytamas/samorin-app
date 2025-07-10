@@ -1,46 +1,53 @@
 <template>
   <div>
-    <h2>Edit Event</h2>
+    <h2>{{ t('editEvent') }}</h2>
     <form @submit.prevent="saveEvent">
       <div>
-        <label>Name:</label>
-        <input v-model="event.name" required>
+        <label>{{ t('name') }}:</label>
+        <input v-model="event.name" required />
       </div>
       <div>
-        <label>Start Date:</label>
-        <input type="date" v-model="event.start_date" required>
+        <label>{{ t('startDate') }}:</label>
+        <input type="date" v-model="event.start_date" required />
       </div>
       <div>
-        <label>End Date:</label>
-        <input type="date" v-model="event.end_date" required>
+        <label>{{ t('endDate') }}:</label>
+        <input type="date" v-model="event.end_date" required />
       </div>
-      <button type="submit">Save</button>
-      <button @click="archiveEvent" type="button" style="color:orange;">Close Event</button>
+      <button type="submit">{{ t('save') }}</button>
+      <button @click="archiveEvent" type="button" style="color:orange;">{{ t('closeEvent') }}</button>
     </form>
 
     <div v-if="successMessage" style="color:green; margin-top:10px;">{{ successMessage }}</div>
     <div v-if="errorMessage" style="color:red; margin-top:10px;">{{ errorMessage }}</div>
 
-    <h3>Arenas</h3>
-   <ul>
-      <li v-for="arena in arenas" :key="arena.id">
+    <h3>{{ t('arenas') }}</h3>
+    <ul>
+      <li v-for="arena in arenas" :key="arena.id" style="margin-bottom: 10px;">
         <template v-if="editingArenaId === arena.id">
-          <input v-model="arenaNewName" @keyup.enter="saveArenaName(arena)" @blur="saveArenaName(arena)" style="width:120px;">
-          <button @click="saveArenaName(arena)">Save</button>
-          <button @click="cancelEditArena">Cancel</button>
+          <input
+            v-model="arenaNewName"
+            @keyup.enter="saveArenaName(arena)"
+            @blur="saveArenaName(arena)"
+            style="width:120px;"
+          />
+          <button @click="saveArenaName(arena)">{{ t('save') }}</button>
+          <button @click="cancelEditArena">{{ t('cancel') }}</button>
         </template>
         <template v-else>
           {{ arena.name }}
-          <button @click="startEditArena(arena)">Edit</button>
+          <button @click="startEditArena(arena)">{{ t('edit') }}</button>
         </template>
       </li>
-      <li v-if="arenas.length === 0" style="color:gray;">No arenas for this event</li>
+      <li v-if="arenas.length === 0" style="color:gray;">{{ t('noArenas') }}</li>
     </ul>
   </div>
 </template>
 
 <script>
-import {fetchEvent, updateEvent, deleteEvent, fetchArenas, updateArena, archiveEvent} from '@/api/api'
+import { fetchEvent, updateEvent, archiveEvent, fetchArenas, updateArena } from '@/api/api'
+import { mapState } from 'vuex'
+import translations from '@/translations'
 
 export default {
   name: "EventEdit",
@@ -51,60 +58,53 @@ export default {
       arenas: [],
       successMessage: '',
       errorMessage: '',
-      editingArenaId: null,      // ← Kell a data-ban!
-      arenaNewName: "",          // ← Kell a data-ban!
+      editingArenaId: null,
+      arenaNewName: ""
+    }
+  },
+  computed: {
+    ...mapState(['lang']),
+    t() {
+      return key => translations[this.lang]?.[key] || key
     }
   },
   methods: {
     loadData() {
       fetchEvent(this.id)
         .then(res => { this.event = res.data; })
-        .catch(() => { this.errorMessage = "Could not load event data"; });
+        .catch(() => { this.errorMessage = this.t('couldNotLoadEvent'); });
 
       fetchArenas()
         .then(res => {
           this.arenas = res.data.filter(a => a.event == this.id);
-        });
+        })
+        .catch(() => { this.arenas = []; });
     },
     saveEvent() {
       updateEvent(this.id, this.event)
         .then(() => {
-          this.successMessage = "Event saved!";
+          this.successMessage = this.t('eventSaved');
           this.errorMessage = "";
           this.$router.push('/events/list');
         })
         .catch(() => {
           this.successMessage = "";
-          this.errorMessage = "Could not save event!";
+          this.errorMessage = this.t('couldNotSaveEvent');
         });
     },
-     archiveEvent() {
-      if (!confirm("Are you sure you want to close and archive this event? All items will be returned to the warehouse and the state will be saved for history.")) return;
+    archiveEvent() {
+      if (!confirm(this.t('confirmCloseEvent'))) return;
       archiveEvent(this.id)
         .then(() => {
-          this.successMessage = "Event archived and all items returned!";
+          this.successMessage = this.t('eventArchived');
           this.errorMessage = "";
           this.$router.push('/events/list');
         })
         .catch(() => {
           this.successMessage = "";
-          this.errorMessage = "Could not archive event!";
+          this.errorMessage = this.t('couldNotArchiveEvent');
         });
     },
-    deleteEvent() {
-      if (!confirm("Are you sure you want to delete this event and all related arenas/poles/wings?")) return;
-      deleteEvent(this.id)
-        .then(() => {
-          this.$router.push('/events/list');
-        })
-        .catch(() => {
-          this.errorMessage = "Could not delete event!";
-        });
-    },
-    goToArenaEdit(arena) {
-      this.$router.push({ name: 'arena-edit', params: { arenaId: arena.id } });
-    },
-    // --- Ezeket is ide tedd ---
     startEditArena(arena) {
       this.editingArenaId = arena.id;
       this.arenaNewName = arena.name;
@@ -114,28 +114,22 @@ export default {
       this.arenaNewName = "";
     },
     saveArenaName(arena) {
-        if (!this.arenaNewName.trim() || this.arenaNewName === arena.name) {
-          this.cancelEditArena();
-          return;
-        }
-        updateArena(arena.id, { name: this.arenaNewName })
-          .then(() => {
-            // Helyben frissítheted (ez csak gyors trükk):
-            // arena.name = this.arenaNewName;
-
-            // HELYETTE: újratöltöd az adatokat a szerverről!
-            this.loadData();           // EZT hívd meg!
-            this.cancelEditArena();
-
-          })
-          .catch(() => {
-            alert("Could not rename arena!");
-          });
+      if (!this.arenaNewName.trim() || this.arenaNewName === arena.name) {
+        this.cancelEditArena();
+        return;
       }
+      updateArena(arena.id, { name: this.arenaNewName })
+        .then(() => {
+          this.loadData();
+          this.cancelEditArena();
+        })
+        .catch(() => {
+          alert(this.t('couldNotRenameArena'));
+        });
+    }
   },
   mounted() {
     this.loadData();
   }
 }
-
 </script>

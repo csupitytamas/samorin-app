@@ -3,21 +3,22 @@ from .models import Wishlist, WishlistPoleItem, WishlistWingItem
 from warehouse.models import Pole, Wings
 
 class WishlistPoleItemSerializer(serializers.ModelSerializer):
-    pole_name = serializers.CharField(source='pole.name_en', read_only=True)
+    pole_name_en = serializers.CharField(source='pole.name_en', read_only=True)
+    pole_name_hu = serializers.CharField(source='pole.name_hu', read_only=True)
     pole_color = serializers.CharField(source='pole.color', read_only=True)
     pole_length = serializers.FloatField(source='pole.length', read_only=True)
-
     class Meta:
         model = WishlistPoleItem
-        fields = ['id', 'pole', 'pole_name', 'pole_color', 'pole_length', 'quantity']
+        fields = ['id', 'pole', 'quantity', 'pole_name_en', 'pole_name_hu', 'pole_color', 'pole_length']
 
 class WishlistWingItemSerializer(serializers.ModelSerializer):
-    wing_name = serializers.CharField(source='wing.name_en', read_only=True)
+    wing_name_en = serializers.CharField(source='wing.name_en', read_only=True)
+    wing_name_hu = serializers.CharField(source='wing.name_hu', read_only=True)
     wing_color = serializers.CharField(source='wing.color', read_only=True)
 
     class Meta:
-        model = WishlistWingItem
-        fields = ['id', 'wing', 'wing_name', 'wing_color', 'quantity']
+        model = WishlistWingItem  # Ezt javítani kellett, nem WishlistPoleItem
+        fields = ['id', 'wing', 'quantity', 'wing_name_en', 'wing_name_hu', 'wing_color']
 
 class WishlistSerializer(serializers.ModelSerializer):
     pole_items = WishlistPoleItemSerializer(many=True, read_only=True)

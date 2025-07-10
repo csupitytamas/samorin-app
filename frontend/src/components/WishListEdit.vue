@@ -1,24 +1,24 @@
 <template>
   <div v-if="wishlist">
-    <h2>Edit Wishlist ({{ wishlist.arena_name }})</h2>
+    <h2>{{ t('editWishlist') }} ({{ wishlist.arena_name }})</h2>
     <div>
-      <label>Note:</label>
-      <textarea v-model="note" rows="3" cols="50"></textarea>
+      <label>{{ t('note') }}:</label>
+      <textarea v-model="note" rows="3" cols="50" :placeholder="t('writeNote') || ''"></textarea>
     </div>
 
     <!-- Wishlist Items: egymás alatt -->
     <div style="margin-top: 2rem;">
-      <h3>Wishlist Items</h3>
-      <div v-if="wishlistItems.length === 0" style="color:gray; margin-bottom:1em;">No items in wishlist</div>
+      <h3>{{ t('wishlistItems') }}</h3>
+      <div v-if="wishlistItems.length === 0" style="color:gray; margin-bottom:1em;">{{ t('noItemsInWishlist') }}</div>
       <div v-for="item in wishlistItems" :key="item.type + '-' + item.id" style="position:relative; margin-bottom:10px; border:1px solid #e1e1e1; border-radius:10px; padding:12px 14px 12px 48px; background:#f8f9fb;">
         <span
           @click="removeItemFromWishlist(item)"
-          title="Remove"
+          :title="t('remove')"
           style="position:absolute; left:12px; top:14px; cursor:pointer; font-size:19px; color:#e11d48; font-weight:bold; line-height:1;">
           ×
         </span>
         <img v-if="item.picture" :src="fullImageUrl(item.picture)" style="height:35px; max-width:50px; object-fit:contain; margin-right:8px;">
-        <b>{{ item.name_en }}</b>
+        <b>{{ lang === 'hu' ? item.name_hu : item.name_en }}</b>
         <span v-if="item.type==='pole'">({{ item.color }}, {{ item.length }} m)</span>
         <span v-else>({{ item.color }})</span>
         <span style="margin-left:10px; color:#888;">x</span>
@@ -29,31 +29,31 @@
           :max="item.number"
           style="width:60px; margin-left:4px;"
         />
-        <span style="color:#aaa; margin-left:8px;">({{ item.type }})</span>
+        <span style="color:#aaa; margin-left:8px;">({{ t(item.type) }})</span>
       </div>
     </div>
 
     <!-- Warehouse grid, egymás alatt -->
     <div style="margin-top: 3.5rem;">
-      <h3>Add New Items from Warehouse</h3>
+      <h3>{{ t('addNewItemsFromWarehouse') }}</h3>
       <div style="margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
         <input
           v-model="gridSearch"
           type="text"
-          placeholder="Keresés név szerint..."
+          :placeholder="t('searchByName')"
           style="padding:4px 10px; border-radius:4px; border:1px solid #bbb;"
         />
         <select v-model="gridColor" style="padding:4px 10px; border-radius:4px;">
-          <option value="">Minden szín</option>
+          <option value="">{{ t('allColors') }}</option>
           <option v-for="color in gridAvailableColors" :key="color" :value="color">{{ color }}</option>
         </select>
         <select v-model="gridType" style="padding:4px 10px; border-radius:4px;">
-          <option value="">Mindkettő</option>
-          <option value="pole">Pole</option>
-          <option value="wing">Wing</option>
+          <option value="">{{ t('both') }}</option>
+          <option value="pole">{{ t('pole') }}</option>
+          <option value="wing">{{ t('wing') }}</option>
         </select>
         <select v-if="gridType === 'pole'" v-model="gridLength" style="padding:4px 10px; border-radius:4px;">
-          <option value="">Minden hossz</option>
+          <option value="">{{ t('allLengths') }}</option>
           <option v-for="len in gridAvailableLengths" :key="len" :value="len">{{ len }} m</option>
         </select>
       </div>
@@ -72,21 +72,21 @@
           />
           <img v-if="item.picture" :src="fullImageUrl(item.picture)" alt="" style="height: 46px; margin-bottom: 6px; object-fit:contain;">
           <div style="font-weight:bold; margin-bottom:2px;">
-            {{ item.name_en || item.name_hu }}
+            {{ lang === 'hu' ? item.name_hu : item.name_en }}
           </div>
           <div style="color:#555;">
             {{ item.color }}
             <span v-if="item.length">, {{ item.length }} m</span>
           </div>
-          <div style="font-size:13px; color:#888; margin-bottom:4px;">Típus: {{ item.type }}</div>
-          <div>Készlet: {{ item.number }}</div>
+          <div style="font-size:13px; color:#888; margin-bottom:4px;">{{ t('type') }}: {{ t(item.type) }}</div>
+          <div>{{ t('stock') }}: {{ item.number }}</div>
           <div v-if="gridSelected.includes(item.type + '-' + item.id)" style="margin-top:6px;">
             <input
               type="number"
               :max="item.number"
               min="1"
               v-model.number="gridQuantities[item.type + '-' + item.id]"
-              :placeholder="`Max: ${item.number}`"
+              :placeholder="`${t('pcs')}: ${item.number}`"
               style="width:68px;"
             />
           </div>
@@ -109,27 +109,29 @@
         </button>
       </div>
       <div v-if="paginatedGridItems.length === 0" style="color:gray; text-align:center; margin-top:1em;">
-        Nincs találat.
+        {{ t('noResults') }}
       </div>
       <div style="text-align:right; margin:18px 0;">
         <button type="button" @click="addSelectedToWishlist" :disabled="gridSelected.length === 0">
-          Add selected to wishlist
+          {{ t('addSelectedToWishlist') }}
         </button>
       </div>
     </div>
+
     <!-- MENTÉS -->
     <div style="margin:30px 0 0 0; text-align:right;">
-      <button @click="saveEdit" :disabled="wishlistItems.length === 0">Save</button>
-      <button type="button" @click="$router.back()" style="margin-left:14px;">Cancel</button>
+      <button @click="saveEdit" :disabled="wishlistItems.length === 0">{{ t('save') }}</button>
+      <button type="button" @click="$router.back()" style="margin-left:14px;">{{ t('cancel') }}</button>
     </div>
     <div v-if="successMessage" style="color:green; margin-top:6px;">{{ successMessage }}</div>
     <div v-if="errorMessage" style="color:red; margin-top:6px;">{{ errorMessage }}</div>
   </div>
 </template>
 
-
 <script>
 import { fetchWishlist, updateWishlist, fetchPoles, fetchWings } from "@/api/api"
+import translations from '@/translations'
+import { mapState } from 'vuex'
 
 export default {
   name: "WishlistEdit",
@@ -139,8 +141,7 @@ export default {
       note: "",
       poles: [],
       wings: [],
-      wishlistItems: [],       // Ez lesz a szerkesztett lista (type/id/quantity/picture/...)
-      // Grid logika (warehouse)
+      wishlistItems: [],
       gridSearch: '',
       gridColor: '',
       gridType: '',
@@ -153,40 +154,12 @@ export default {
       errorMessage: "",
     }
   },
-  async mounted() {
-    const id = this.$route.params.id
-    try {
-      const [wishlistRes, polesRes, wingsRes] = await Promise.all([
-        fetchWishlist(id), fetchPoles(), fetchWings()
-      ])
-      this.wishlist = wishlistRes.data
-      this.note = this.wishlist.note || ""
-      this.poles = polesRes.data
-      this.wings = wingsRes.data
-
-      // 1. Wishlist items feltöltése (összevont lista, quantity-vel)
-      this.wishlistItems = [
-        ...(this.wishlist.pole_items || []).map(p => ({
-          ...this.poles.find(z => z.id === p.pole),
-          type: 'pole',
-          quantity: p.quantity
-        })),
-        ...(this.wishlist.wing_items || []).map(w => ({
-          ...this.wings.find(z => z.id === w.wing),
-          type: 'wing',
-          quantity: w.quantity
-        })),
-      ]
-      // 2. GridSelected/gridQuantities üresre állítva, warehouse-ból csak újakat lehet hozzáadni
-      this.gridSelected = []
-      this.gridQuantities = {}
-    } catch (err) {
-      this.errorMessage = "Could not load wishlist"
-    }
-  },
   computed: {
+    ...mapState(['lang']),
+    t() {
+      return key => translations[this.lang]?.[key] || key
+    },
     gridAvailableItems() {
-      // Csak azok, amik nincsenek a wishlistItems-ben
       const usedPoleIds = new Set(this.wishlistItems.filter(x => x.type === 'pole').map(x => x.id))
       const usedWingIds = new Set(this.wishlistItems.filter(x => x.type === 'wing').map(x => x.id))
       return [
@@ -229,6 +202,35 @@ export default {
     gridType() { this.gridCurrentPage = 1; },
     gridLength() { this.gridCurrentPage = 1; },
   },
+  async mounted() {
+    const id = this.$route.params.id
+    try {
+      const [wishlistRes, polesRes, wingsRes] = await Promise.all([
+        fetchWishlist(id), fetchPoles(), fetchWings()
+      ])
+      this.wishlist = wishlistRes.data
+      this.note = this.wishlist.note || ""
+      this.poles = polesRes.data
+      this.wings = wingsRes.data
+
+      this.wishlistItems = [
+        ...(this.wishlist.pole_items || []).map(p => ({
+          ...this.poles.find(z => z.id === p.pole),
+          type: 'pole',
+          quantity: p.quantity
+        })),
+        ...(this.wishlist.wing_items || []).map(w => ({
+          ...this.wings.find(z => z.id === w.wing),
+          type: 'wing',
+          quantity: w.quantity
+        })),
+      ]
+      this.gridSelected = []
+      this.gridQuantities = {}
+    } catch (err) {
+      this.errorMessage = this.t('couldNotLoadWishlist') || "Could not load wishlist"
+    }
+  },
   methods: {
     fullImageUrl(path) {
       if (!path) return "";
@@ -236,13 +238,11 @@ export default {
       return "http://localhost:8000" + path;
     },
     removeItemFromWishlist(item) {
-      // Törlés X-re: csak a helyi szerkesztett listából veszi ki, azonnal eltűnik
       this.wishlistItems = this.wishlistItems.filter(
         x => !(x.type === item.type && x.id === item.id)
       )
     },
     addSelectedToWishlist() {
-      // A warehouse-gridből kijelölt elemek hozzáadása a wishlisthez (helyi state)
       for (const key of this.gridSelected) {
         const [type, idStr] = key.split('-');
         const id = Number(idStr);
@@ -255,18 +255,15 @@ export default {
           item = { ...this.wings.find(w => w.id === id), type: 'wing', quantity }
         }
         if (item) {
-          // Csak ha még nincs bent
           if (!this.wishlistItems.some(x => x.type === type && x.id === id)) {
             this.wishlistItems.push(item)
           }
         }
       }
-      // Grid clear
       this.gridSelected = []
       this.gridQuantities = {}
     },
     async saveEdit() {
-      // A wishlistItems aktuális állapotából generáljuk az inputot:
       const pole_items = this.wishlistItems
         .filter(x => x.type === 'pole')
         .map(x => ({
@@ -282,7 +279,7 @@ export default {
         }))
         .filter(item => item.quantity > 0)
       if (pole_items.length === 0 && wing_items.length === 0) {
-        this.errorMessage = "Please add at least one item!";
+        this.errorMessage = this.t('addAtLeastOne') || "Please add at least one item!";
         return;
       }
       try {
@@ -293,12 +290,12 @@ export default {
             wing_items_input: wing_items
           }
         )
-        this.successMessage = "Wishlist updated!"
+        this.successMessage = this.t('wishlistUpdated') || "Wishlist updated!"
         setTimeout(() => {
           this.$router.back()
         }, 1000)
       } catch (err) {
-        this.errorMessage = "Update failed!"
+        this.errorMessage = this.t('updateFailed') || "Update failed!"
       }
     }
   }

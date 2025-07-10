@@ -1,7 +1,6 @@
-
 import axios from 'axios'
 
-// Interceptor for requests (always send the access token)
+// TOKEN INTERCEPTORS
 axios.interceptors.request.use(config => {
   const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token')
   if (token) {
@@ -10,133 +9,104 @@ axios.interceptors.request.use(config => {
   return config
 })
 
-// Interceptor for responses (auto-refresh on 401)
 axios.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config
-
-    // If access token expired (401), and we haven't retried yet
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
       const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token')
       if (refreshToken) {
         try {
-          // Request a new access token with the refresh token
           const res = await axios.post('/api/token/refresh/', { refresh: refreshToken })
           const newAccess = res.data.access
-
-          // Save new access token (same storage as refresh)
           if (localStorage.getItem('refresh_token')) {
             localStorage.setItem('access_token', newAccess)
           } else {
             sessionStorage.setItem('access_token', newAccess)
           }
-          // Set header for the new request
           originalRequest.headers['Authorization'] = `Bearer ${newAccess}`
-          // Retry the original request with new token
           return axios(originalRequest)
-        } catch (refreshError) {
-          // If refresh fails (refresh token expired), log out
+        } catch {
           localStorage.removeItem('access_token')
           localStorage.removeItem('refresh_token')
           sessionStorage.removeItem('access_token')
           sessionStorage.removeItem('refresh_token')
-          // Optionally redirect to login page
           window.location.href = '/login'
         }
       } else {
-        // No refresh token: redirect to login
         window.location.href = '/login'
       }
     }
-    // If other error, just reject
     return Promise.reject(error)
   }
-
-
 )
-const API_BASE = 'http://localhost:8000/api/';
 
-// EVENTS
+const API_BASE = 'http://localhost:8000/api/'
+
+// --- API FÜGGVÉNYEK ---
 export function fetchEvents() {
-  return axios.get(API_BASE + 'events/');
+  return axios.get(API_BASE + 'events/')
 }
 export function createEvent(data) {
-  return axios.post(API_BASE + 'events/', data);
+  return axios.post(API_BASE + 'events/', data)
 }
-
-// ARENAS
 export function fetchArenas() {
-  return axios.get(API_BASE + 'arenas/');
+  return axios.get(API_BASE + 'arenas/')
 }
 export function createArena(data) {
-  return axios.post(API_BASE + 'arenas/', data);
+  return axios.post(API_BASE + 'arenas/', data)
 }
-
-// POLES
 export function fetchPoles() {
-  return axios.get(API_BASE + 'poles/');
+  return axios.get(API_BASE + 'poles/')
 }
-
-// WINGS
 export function fetchWings() {
-  return axios.get(API_BASE + 'wings/');
+  return axios.get(API_BASE + 'wings/')
 }
-
-// POLE LOCATIONS
 export function createPoleLocation(data) {
-  return axios.post(API_BASE + 'pole-locations/', data);
+  return axios.post(API_BASE + 'pole-locations/', data)
 }
-
-// WING LOCATIONS
 export function createWingLocation(data) {
-  return axios.post(API_BASE + 'wing-locations/', data);
+  return axios.post(API_BASE + 'wing-locations/', data)
 }
-
 export function fetchPoleLocationsByArena(arenaId) {
-  return axios.get(`http://localhost:8000/api/pole-locations/?arena=${arenaId}`);
+  return axios.get(API_BASE + `pole-locations/?arena=${arenaId}`)
 }
-
 export function fetchWingLocationsByArena(arenaId) {
-  return axios.get(`http://localhost:8000/api/wing-locations/?arena=${arenaId}`);
+  return axios.get(API_BASE + `wing-locations/?arena=${arenaId}`)
 }
-
 export function fetchEventDetails(id) {
-  return axios.get(API_BASE + `events/${id}/full_details/`);
+  return axios.get(API_BASE + `events/${id}/full_details/`)
 }
-
 export function fetchEvent(id) {
-  return axios.get(API_BASE + 'events/' + id + '/');
+  return axios.get(API_BASE + 'events/' + id + '/')
 }
-
 export function deletePoleLocation(id) {
-  return axios.delete(API_BASE + `pole-locations/${id}/`);
+  return axios.delete(API_BASE + `pole-locations/${id}/`)
 }
 export function deleteWingsLocation(id) {
-  return axios.delete(API_BASE + `wing-locations/${id}/`);
+  return axios.delete(API_BASE + `wing-locations/${id}/`)
 }
-
 export function deleteEvent(eventId) {
-  return axios.delete(API_BASE + 'events/' + eventId + '/');
+  return axios.delete(API_BASE + 'events/' + eventId + '/')
 }
 export function updateEvent(eventId, data) {
-  return axios.put(API_BASE + 'events/' + eventId + '/', data);
+  return axios.put(API_BASE + 'events/' + eventId + '/', data)
 }
 export function updateArena(arenaId, data) {
-  return axios.patch( API_BASE + `arenas/${arenaId}/`, data);
+  return axios.patch(API_BASE + `arenas/${arenaId}/`, data)
 }
 export function createWishlist(data) {
-  return axios.post(API_BASE + 'wishlist/', data);
+  return axios.post(API_BASE + 'wishlist/', data)
 }
 export function archiveEvent(eventId) {
-  return axios.post(API_BASE + `events/${eventId}/archive/`);
+  return axios.post(API_BASE + `events/${eventId}/archive/`)
 }
 export function fetchArchivedEvents() {
-  return axios.get(API_BASE + 'archived-events/');
+  return axios.get(API_BASE + 'archived-events/')
 }
 export function fetchArchivedEventDetails(id) {
-  return axios.get(API_BASE + 'archived-events/' + id + '/');
+  return axios.get(API_BASE + 'archived-events/' + id + '/')
 }
 export function registerUser(data) {
   return axios.post(API_BASE + 'users/register/', data)
@@ -156,11 +126,9 @@ export function logoutUser() {
   sessionStorage.removeItem('access_token')
   sessionStorage.removeItem('refresh_token')
 }
-
 export function fetchUsers() {
   return axios.get(API_BASE + 'users/userprofiles/').then(r => r.data)
 }
-
 export function updateUserRole(id, data) {
   return axios.patch(API_BASE + `users/userprofiles/${id}/`, data)
 }
@@ -170,21 +138,21 @@ export function fetchWarehouses() {
 export function createPole(data) {
   return axios.post(API_BASE + 'poles/', data)
 }
-
 export function createWings(data) {
   return axios.post(API_BASE + 'wings/', data)
 }
-
 export function wishList(data) {
   return axios.post(API_BASE + 'wishlist/', data)
 }
 export function fetchWishlist(id) {
   return axios.get(API_BASE + `wishlist/${id}/`)
 }
-
 export function updateWishlist(id, data) {
   return axios.patch(API_BASE + `wishlist/${id}/`, data)
 }
 export function fetchEventWishlists(eventId) {
   return axios.get(API_BASE + `events/${eventId}/all_wishlists/`)
+}
+export function fetchActiveArenas() {
+  return axios.get(API_BASE + 'active-arenas/')
 }

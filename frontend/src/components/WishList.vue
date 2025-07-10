@@ -1,37 +1,34 @@
 <template>
   <div>
-    <h2>Wishlist Submission</h2>
+    <h2>{{ t('submitWishlist') }}</h2>
     <div>
-      <label>Arena:</label>
+      <label>{{ t('arena') }}:</label>
       <select v-model="selectedArena" required>
         <option v-for="arena in arenas" :key="arena.id" :value="arena.id">
           {{ arena.name }}
         </option>
       </select>
     </div>
-
-    <!-- GRID nézet minden eszközre -->
     <form @submit.prevent="submitWishlist" style="margin-top: 2rem;">
-      <h3 style="font-weight:bold;">Válassz eszközöket (kártyás/grid, kereső/szűrő)</h3>
       <div style="margin-bottom: 16px; display: flex; gap: 12px;">
         <input
           v-model="gridSearch"
           type="text"
-          placeholder="Keresés név szerint..."
+          :placeholder="t('searchByName')"
           style="padding:4px 10px; border-radius:4px; border:1px solid #bbb;"
         />
         <select v-model="gridColor" style="padding:4px 10px; border-radius:4px;">
-          <option value="">Minden szín</option>
+          <option value="">{{ t('allColors') }}</option>
           <option v-for="color in gridAvailableColors" :key="color" :value="color">{{ color }}</option>
         </select>
         <select v-model="gridType" style="padding:4px 10px; border-radius:4px;">
-          <option value="">Mindkettő</option>
-          <option value="pole">Pole</option>
-          <option value="wing">Wing</option>
+          <option value="">{{ t('both') }}</option>
+          <option value="pole">{{ t('pole') }}</option>
+          <option value="wing">{{ t('wing') }}</option>
         </select>
         <!-- Length filter csak Pole esetén -->
         <select v-if="gridType === 'pole'" v-model="gridLength" style="padding:4px 10px; border-radius:4px;">
-          <option value="">Minden hossz</option>
+          <option value="">{{ t('allLengths') }}</option>
           <option v-for="len in gridAvailableLengths" :key="len" :value="len">
             {{ len }} m
           </option>
@@ -58,14 +55,16 @@
             style="height: 70px; margin-bottom: 8px; object-fit: contain;"
           />
           <div style="font-weight: bold; margin-bottom: 2px;">
-            {{ item.name_en || item.name_hu }}
+            {{ lang === 'hu' ? item.name_hu : item.name_en }}
           </div>
           <div style="color:#555;">
             {{ item.color }}
             <span v-if="item.length">, {{ item.length }} m</span>
           </div>
-          <div style="font-size:13px; color:#888; margin-bottom:4px;">Típus: {{ item.type }}</div>
-          <div>Készlet: {{ item.number }}</div>
+          <div style="font-size:13px; color:#888; margin-bottom:4px;">
+            {{ t(item.type) }}
+          </div>
+          <div>{{ t('stock') }}: {{ item.number }}</div>
           <!-- Quantity input, ha kijelölve -->
           <div v-if="gridSelected.includes(item.type + '-' + item.id)" style="margin-top:7px;">
             <input
@@ -96,22 +95,23 @@
         </button>
       </div>
       <div v-if="paginatedGridItems.length === 0" style="color:gray; text-align:center; margin-top:1em;">
-        Nincs találat.
+        {{ t('noResults') }}
       </div>
 
       <!-- Megjegyzés -->
       <div style="margin:24px 0;">
-        <label for="wishlist-note">Megjegyzés (opcionális):</label>
+        <label for="wishlist-note">{{ t('note') }}</label>
         <textarea
           id="wishlist-note"
           v-model="note"
           rows="2"
           cols="40"
-          placeholder="Írj megjegyzést..."></textarea>
+          :placeholder="t('writeNote') || 'Írj megjegyzést...'"
+        ></textarea>
       </div>
       <div style="text-align:right; margin:24px 0;">
         <button type="submit" :disabled="gridSelected.length === 0">
-          Submit Wishlist
+          {{ t('submitWishlist') || 'Submit Wishlist' }}
         </button>
       </div>
     </form>
@@ -121,7 +121,9 @@
 </template>
 
 <script>
-import { fetchArenas, fetchPoles, fetchWings, wishList } from '@/api/api'
+import { fetchActiveArenas, fetchPoles, fetchWings, wishList } from '@/api/api'
+import translations from '@/translations'
+import { mapState } from 'vuex'
 
 export default {
   name: 'WishlistCreate',
@@ -134,7 +136,6 @@ export default {
       note: "",
       successMessage: '',
       errorMessage: '',
-      // GRID
       gridSearch: '',
       gridColor: '',
       gridType: '',
@@ -145,17 +146,16 @@ export default {
       gridQuantities: {},
     }
   },
-  mounted() {
-    fetchArenas().then(res => { this.arenas = res.data; });
-    fetchPoles().then(res => { this.poles = res.data; });
-    fetchWings().then(res => { this.wings = res.data; });
-  },
   computed: {
+    ...mapState(['lang']),
+    t() {
+      return key => translations[this.lang]?.[key] || key
+    },
     gridAvailableItems() {
       return [
         ...this.poles.map(p => ({ ...p, type: 'pole' })),
         ...this.wings.map(w => ({ ...w, type: 'wing' }))
-      ].filter(i => i.number > 0)
+      ];
     },
     gridAvailableColors() {
       return [...new Set(this.gridAvailableItems.map(i => i.color).filter(Boolean))];
@@ -179,7 +179,7 @@ export default {
       )
     },
     gridPageCount() {
-      return Math.ceil(this.filteredGridItems.length / this.gridPerPage)
+      return Math.ceil(this.filteredGridItems.length / this.gridPerPage) || 1
     },
     paginatedGridItems() {
       const start = (this.gridCurrentPage - 1) * this.gridPerPage
@@ -192,6 +192,11 @@ export default {
     gridType() { this.gridCurrentPage = 1; },
     gridLength() { this.gridCurrentPage = 1; },
   },
+  mounted() {
+    fetchActiveArenas().then(res => { this.arenas = res.data; });
+    fetchPoles().then(res => { this.poles = res.data; });
+    fetchWings().then(res => { this.wings = res.data; });
+  },
   methods: {
     fullImageUrl(path) {
       if (!path) return "";
@@ -200,35 +205,22 @@ export default {
     },
     submitWishlist() {
       if (!this.selectedArena) {
-        this.errorMessage = "Please select an arena!";
+        this.errorMessage = this.t('selectArena') || "Please select an arena!";
         return;
       }
-
-      // Kijelölt ID-kból külön pole_items, wing_items
-      const pole_items = this.gridSelected
-        .filter(key => key.startsWith('pole-'))
-        .map(key => {
-          const id = Number(key.split('-')[1]);
-          return {
-            pole: id,
-            quantity: this.gridQuantities[key] || 1
-          }
-        })
-        .filter(item => item.quantity > 0);
-
-      const wing_items = this.gridSelected
-        .filter(key => key.startsWith('wing-'))
-        .map(key => {
-          const id = Number(key.split('-')[1]);
-          return {
-            wing: id,
-            quantity: this.gridQuantities[key] || 1
-          }
-        })
-        .filter(item => item.quantity > 0);
+      // Pole és Wing itemek összegyűjtése checkbox szerint
+      const pole_items = [];
+      const wing_items = [];
+      for (const key of this.gridSelected) {
+        const [type, idStr] = key.split('-');
+        const id = Number(idStr);
+        const quantity = this.gridQuantities[key] || 1;
+        if (type === 'pole') pole_items.push({ pole: id, quantity });
+        if (type === 'wing') wing_items.push({ wing: id, quantity });
+      }
 
       if (pole_items.length === 0 && wing_items.length === 0) {
-        this.errorMessage = "Please add at least one item!";
+        this.errorMessage = this.t('addAtLeastOne') || "Please add at least one item!";
         return;
       }
 
@@ -239,7 +231,7 @@ export default {
         wing_items_input: wing_items
       })
       .then(() => {
-        this.successMessage = "Wishlist saved!";
+        this.successMessage = this.t('wishlistSaved') || "Wishlist saved!";
         this.errorMessage = "";
         this.gridSelected = [];
         this.gridQuantities = {};
@@ -247,7 +239,7 @@ export default {
       })
       .catch(err => {
         this.successMessage = "";
-        this.errorMessage = "Error: " + (err.response?.data?.detail || err.message);
+        this.errorMessage = this.t('errorOccurred') + ": " + (err.response?.data?.detail || err.message);
       });
     }
   }

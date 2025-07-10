@@ -40,27 +40,34 @@ export default {
       success: false,
     }
   },
-  methods: {
-    async handleRegister() {
-      this.error = ''
-      this.success = false
-      try {
+methods: {
+  async handleRegister() {
+    this.error = ''
+    this.success = false
+    try {
       await registerUser({
         username: this.username,
         email: this.email,
         password: this.password,
       })
-        this.success = true
-        this.username = ''
-        this.email = ''
-        this.password = ''
-      } catch (err) {
-        this.error =
-          err.response?.data?.detail ||
-          'An error occurred during registration.'
+      this.success = true
+      this.username = ''
+      this.email = ''
+      this.password = ''
+    } catch (err) {
+      let detail = err.response?.data?.detail || err.response?.data?.email || err.message
+      if (typeof detail === 'object' && Array.isArray(detail)) {
+        detail = detail.join(' ')
       }
-    },
+      // Email duplikáció detektálása
+      if ((detail + '').toLowerCase().includes('email')) {
+        this.error = 'This email is already taken!'
+      } else {
+        this.error = detail || 'Hiba történt a regisztráció során.'
+      }
+    }
   },
+},
 }
 </script>
 

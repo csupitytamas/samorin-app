@@ -1,17 +1,26 @@
 <template>
   <div class="admin-dashboard">
-    <h2>Admin Dashboard</h2>
+    <h2>{{ t('adminDashboard') }}</h2>
     <div class="admin-buttons">
-      <button @click="goTo('user-admin')">User admin</button>
-      <button @click="goTo('pole-create')">Add new Pole</button>
-      <button @click="goTo('wings-create')">Add new Wings</button>
+      <button @click="goTo('user-admin')">{{ t('userAdmin') }}</button>
+      <button @click="goTo('pole-create')">{{ t('addPole') }}</button>
+      <button @click="goTo('wings-create')">{{ t('addWings') }}</button>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex"
+import translations from "@/translations"
+
 export default {
   name: "AdminDashboard",
+  computed: {
+    ...mapState(['lang']),
+    t() {
+      return key => translations[this.lang]?.[key] || key
+    }
+  },
   methods: {
     goTo(routeName) {
       this.$router.push({ name: routeName })

@@ -35,18 +35,17 @@ class EventViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def archive(self, request, pk=None):
         event = self.get_object()
-        # Már archivált? Dupla archiválás ellenőrzése
         if event.is_archived:
             return Response({'detail': 'Already archived.'}, status=400)
-        # 1. Archív event létrehozás
         archived_event = ArchivedEvent.objects.create(event=event, closed_at=timezone.now())
-        # 2. Minden arena archiválása
         for arena in Arena.objects.filter(event=event):
+            # IDE jön ez a sor!:
             archived_arena = ArchivedArena.objects.create(
                 archived_event=archived_event,
-                name=arena.name
+                name=arena.name,
+                original_arena_id=arena.id  # <-- EZ FONTOS!
             )
-            # 3. Minden pole location archiválása
+            # ... a többi maradhat ...
             for ploc in PoleLocation.objects.filter(arena=arena):
                 ArchivedPoleLocation.objects.create(
                     archived_arena=archived_arena,
@@ -55,10 +54,8 @@ class EventViewSet(viewsets.ModelViewSet):
                     length=ploc.pole.length,
                     quantity=ploc.quantity
                 )
-                # 4. Pole warehouse növelése (visszaadás)
                 ploc.pole.number += ploc.quantity
                 ploc.pole.save()
-            # 5. Minden wing location archiválása
             for wloc in WingLocation.objects.filter(arena=arena):
                 ArchivedWingLocation.objects.create(
                     archived_arena=archived_arena,
@@ -68,7 +65,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
                 wloc.wing.number += wloc.quantity
                 wloc.wing.save()
-        # 6. Esemény archiválása
         event.is_archived = True
         event.is_active = False
         event.save()
@@ -122,3 +118,11 @@ class ArchivedEventViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = ArchivedEvent.objects.all()
     serializer_class = ArchivedEventDetailSerializer
 
+class ActiveArenaViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = ArenaSerializer
+    queryset = Arena.objects.all()
+    def get_queryset(self):
+        # Lekérjük az összes archivált aréna "original_arena_id"-ját
+        archived_ids = ArchivedArena.objects.values_list('original_arena_id', flat=True)
+        # Csak azok az arénák, amik nincsenek archiválva, ÉS az eventjük aktív/élő
+        return Arena.objects.exclude(id__in=archived_ids).filter(event__is_active=True, event__is_archived=False)

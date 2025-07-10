@@ -1,40 +1,40 @@
 <template>
   <div>
-    <h2>Running Events </h2>
+    <h2>{{ t('runningEvents') }}</h2>
     <ul>
       <li v-for="event in runningEvents" :key="event.id" @click="goToEventDetails(event)" style="cursor:pointer;">
-        <b>{{ event.name }}</b>
+        <b>{{ lang === 'hu' ? event.name_hu || event.name : event.name_en || event.name }}</b>
         <span> ({{ event.start_date }} - {{ event.end_date }})</span>
       </li>
-      <li v-if="runningEvents.length === 0" style="color:gray;">No running events</li>
+      <li v-if="runningEvents.length === 0" style="color:gray;">{{ t('noRunningEvents') }}</li>
     </ul>
 
-    <h2>Upcoming Events (starting within 1 month)</h2>
+    <h2>{{ t('upcomingEvents') }}</h2>
     <ul>
       <li v-for="event in upcomingEvents" :key="event.id" @click="goToEventDetails(event)" style="cursor:pointer;">
-        <b>{{ event.name }}</b>
+        <b>{{ lang === 'hu' ? event.name_hu || event.name : event.name_en || event.name }}</b>
         <span> ({{ event.start_date }} - {{ event.end_date }})</span>
       </li>
-      <li v-if="upcomingEvents.length === 0" style="color:gray;">No upcoming events</li>
+      <li v-if="upcomingEvents.length === 0" style="color:gray;">{{ t('noUpcomingEvents') }}</li>
     </ul>
 
     <div v-if="eventDetails">
-      <h3>Arenas:</h3>
+      <h3>{{ t('arenas') }}:</h3>
       <div v-for="arenaObj in eventDetails.arenas" :key="arenaObj.arena.id" style="margin-bottom: 1.5rem;">
-        <b>{{ arenaObj.arena.name }}</b>
+        <b>{{ lang === 'hu' ? arenaObj.arena.name_hu || arenaObj.arena.name : arenaObj.arena.name_en || arenaObj.arena.name }}</b>
         <div>
-          <span>Poles:</span>
+          <span>{{ t('poles') }}:</span>
           <ul>
             <li v-for="poleLoc in arenaObj.poles" :key="poleLoc.id">
-              {{ poleLoc.pole.name_hu }} ({{ poleLoc.quantity }})
+              {{ lang === 'hu' ? poleLoc.pole.name_hu : poleLoc.pole.name_en }} ({{ poleLoc.quantity }})
             </li>
           </ul>
         </div>
         <div>
-          <span>Wings:</span>
+          <span>{{ t('wings') }}:</span>
           <ul>
             <li v-for="wingLoc in arenaObj.wings" :key="wingLoc.id">
-              {{ wingLoc.wing.name_hu }} ({{ wingLoc.quantity }})
+              {{ lang === 'hu' ? wingLoc.wing.name_hu : wingLoc.wing.name_en }} ({{ wingLoc.quantity }})
             </li>
           </ul>
         </div>
@@ -42,8 +42,11 @@
     </div>
   </div>
 </template>
+
 <script>
-import { fetchEvents } from '@/api/api';
+import { fetchEvents } from '@/api/api'
+import { mapState } from 'vuex'
+import translations from '@/translations'
 
 export default {
   name: "EventList",
@@ -55,9 +58,15 @@ export default {
       eventDetails: null,
     }
   },
+  computed: {
+    ...mapState(['lang']),
+    t() {
+      return key => translations[this.lang]?.[key] || key
+    }
+  },
   methods: {
     goToEventDetails(event) {
-      this.$router.push({ name: 'event-details', params: { id: event.id } });
+      this.$router.push({ name: 'event-details', params: { id: event.id } })
     },
     filterEvents() {
       const today = new Date();

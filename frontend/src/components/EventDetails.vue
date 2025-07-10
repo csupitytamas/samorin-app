@@ -1,16 +1,16 @@
 <template>
   <div>
-    <h2>Event Details</h2>
-    <button @click="goToEventEdit" style="margin-bottom: 1rem;">Edit Event</button>
+    <h2>{{ t('eventDetails') }}</h2>
+    <button @click="goToEventEdit" style="margin-bottom: 1rem;">{{ t('editEvent') }}</button>
     <button
       v-if="eventDetails && eventDetails.arenas && eventDetails.arenas.length > 0"
       @click="goToEventWishlists"
       style="margin-bottom: 2rem; margin-left:12px; padding:5px 20px; border-radius:7px; border:1px solid #bbb; background:#e9f5fd; color:#185eb8; font-weight:bold;"
     >
-      View all Wishlists for this Event
+      {{ t('viewAllWishlists') }}
     </button>
     <div v-if="eventDetails">
-      <h3>Arenas</h3>
+      <h3>{{ t('arenas') }}</h3>
       <div v-for="arenaObj in eventDetails.arenas" :key="arenaObj.arena.id" style="margin-bottom: 2rem;">
         <h4>
           <a @click.prevent="goToArenaEdit(arenaObj.arena.id)" href="#" style="cursor:pointer; color:blue; text-decoration:underline;">
@@ -22,16 +22,16 @@
         <table border="1" cellpadding="6" style="margin-bottom:1rem; min-width:500px;">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Number</th>
-              <th>Color</th>
-              <th>Length (m)</th>
-              <th>Image</th>
+              <th>{{ t('name') }}</th>
+              <th>{{ t('number') }}</th>
+              <th>{{ t('color') }}</th>
+              <th>{{ t('length') }}</th>
+              <th>{{ t('image') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="poleLoc in arenaObj.poles" :key="poleLoc.id">
-              <td>{{ poleLoc.pole.name_en }}</td>
+              <td>{{ lang === 'hu' ? poleLoc.pole.name_hu : poleLoc.pole.name_en }}</td>
               <td>{{ poleLoc.quantity }}</td>
               <td>{{ poleLoc.pole.color }}</td>
               <td>{{ poleLoc.pole.length }}</td>
@@ -45,7 +45,7 @@
               </td>
             </tr>
             <tr v-if="arenaObj.poles.length === 0">
-              <td colspan="5" style="text-align:center; color:gray;">No poles for this arena</td>
+              <td colspan="5" style="text-align:center; color:gray;">{{ t('noPolesForArena') }}</td>
             </tr>
           </tbody>
         </table>
@@ -54,15 +54,15 @@
         <table border="1" cellpadding="6" style="min-width:400px;">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Number</th>
-              <th>Color</th>
-              <th>Image</th>
+              <th>{{ t('name') }}</th>
+              <th>{{ t('number') }}</th>
+              <th>{{ t('color') }}</th>
+              <th>{{ t('image') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="wingLoc in arenaObj.wings" :key="wingLoc.id">
-              <td>{{ wingLoc.wing.name_en }}</td>
+              <td>{{ lang === 'hu' ? wingLoc.wing.name_hu : wingLoc.wing.name_en }}</td>
               <td>{{ wingLoc.quantity }}</td>
               <td>{{ wingLoc.wing.color }}</td>
               <td>
@@ -75,18 +75,20 @@
               </td>
             </tr>
             <tr v-if="arenaObj.wings.length === 0">
-              <td colspan="4" style="text-align:center; color:gray;">No wings for this arena</td>
+              <td colspan="4" style="text-align:center; color:gray;">{{ t('noWingsForArena') }}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <div v-else>Loading...</div>
+    <div v-else>{{ t('loading') }}</div>
   </div>
 </template>
 
 <script>
 import { fetchEventDetails } from '@/api/api';
+import { mapState } from 'vuex'
+import translations from '@/translations'
 
 export default {
   name: "EventDetails",
@@ -94,13 +96,19 @@ export default {
   data() {
     return { eventDetails: null }
   },
- mounted() {
-  fetchEventDetails(this.id)
-    .then(res => {
-      this.eventDetails = res.data;
-    })
-    .catch(err => { console.error(err); });
-},
+  computed: {
+    ...mapState(['lang']),
+    t() {
+      return key => translations[this.lang]?.[key] || key
+    }
+  },
+  mounted() {
+    fetchEventDetails(this.id)
+      .then(res => {
+        this.eventDetails = res.data;
+      })
+      .catch(err => { console.error(err); });
+  },
   methods: {
     fullImageUrl(path) {
       if (!path) return "";
@@ -113,24 +121,23 @@ export default {
     goToEventEdit() {
       this.$router.push({name: 'event-edit', params: {eventId: this.id}});
     },
-  goToEventWishlists() {
-  // Az első aréna event mezőjéből olvasd ki az id-t!
-  if (
-    this.eventDetails &&
-    this.eventDetails.arenas &&
-    this.eventDetails.arenas.length > 0 &&
-    this.eventDetails.arenas[0].arena &&
-    this.eventDetails.arenas[0].arena.event
-  ) {
-    const eventId = this.eventDetails.arenas[0].arena.event;
-    this.$router.push({
-      name: 'event-wishlists',
-      params: { eventId: String(eventId) }
-    });
-  } else {
-    console.log("No eventId found in eventDetails!");
-  }
-}
+    goToEventWishlists() {
+      if (
+        this.eventDetails &&
+        this.eventDetails.arenas &&
+        this.eventDetails.arenas.length > 0 &&
+        this.eventDetails.arenas[0].arena &&
+        this.eventDetails.arenas[0].arena.event
+      ) {
+        const eventId = this.eventDetails.arenas[0].arena.event;
+        this.$router.push({
+          name: 'event-wishlists',
+          params: { eventId: String(eventId) }
+        });
+      } else {
+        console.log("No eventId found in eventDetails!");
+      }
+    }
   }
 }
 </script>

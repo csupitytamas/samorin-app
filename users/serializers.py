@@ -10,13 +10,19 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('username', 'password', 'email')
         extra_kwargs = {'password': {'write_only': True}}
 
+    # EZ az email mező VALIDÁTOR
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use!")
+        return value
+
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password']
         )
-        UserProfile.objects.create(user=user, role='worker')  # <--- EZ A LÉNYEG
+        UserProfile.objects.create(user=user, role='worker')
         return user
 
 

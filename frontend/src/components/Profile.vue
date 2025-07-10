@@ -1,47 +1,56 @@
 <template>
   <div class="profile">
-    <h2>Profile</h2>
+    <h2>{{ t('profile') }}</h2>
+
     <div v-if="profile">
-      <p><strong>Username:</strong> {{ profile.username }}</p>
-      <p><strong>Email:</strong> {{ profile.email }}</p>
-      <button @click="logout">Logout</button>
+      <p><strong>{{ t('username') }}:</strong> {{ profile.username }}</p>
+      <p><strong>{{ t('email') }}:</strong> {{ profile.email }}</p>
+      <div style="margin-bottom: 1.5em;">
+        <label for="lang"><b>{{ t('language') }}:</b></label>
+        <select id="lang" :value="lang" @change="setLang($event.target.value)" style="margin-left: 8px;">
+          <option value="en">English</option>
+          <option value="hu">Magyar</option>
+        </select>
+      </div>
+      <button @click="logout">{{ t('logout') }}</button>
     </div>
 
     <div v-if="wishlists.length">
-      <h3>My Wishlists</h3>
-    <ul>
-      <li v-for="wishlist in wishlists" :key="wishlist.id">
-        <strong>{{ wishlist.arena_name }}</strong>
-        <div v-if="wishlist.note"><i>Note:</i> {{ wishlist.note }}</div>
-            <button @click="editWishlist(wishlist.id)">Edit</button>
-
-        <ul>
-          <li v-if="wishlist.pole_items && wishlist.pole_items.length">
-          <b>Pole items:</b>
+      <h3>{{ t('myWishlists') }}</h3>
+      <ul>
+        <li v-for="wishlist in wishlists" :key="wishlist.id">
+          <strong>{{ wishlist.arena_name }}</strong>
+          <div v-if="wishlist.note">
+            <i>{{ t('note') }}:</i> {{ wishlist.note }}
+          </div>
+          <button @click="editWishlist(wishlist.id)">{{ t('edit') }}</button>
           <ul>
-            <li v-for="pole in wishlist.pole_items" :key="pole.id">
-              {{ pole.pole_name }} ({{ pole.pole_color }}) – {{ pole.quantity }} db
+            <li v-if="wishlist.pole_items && wishlist.pole_items.length">
+              <b>{{ t('poleItems') }}:</b>
+              <ul>
+                <li v-for="pole in wishlist.pole_items" :key="pole.id">
+                {{ lang === 'hu' ? pole.pole_name_hu : pole.pole_name_en }} ({{ pole.pole_color }}, {{ pole.pole_length }}m) – {{ pole.quantity }} db
+              </li>
+              </ul>
+            </li>
+            <li v-if="wishlist.wing_items && wishlist.wing_items.length">
+              <b>{{ t('wingItems') }}:</b>
+              <ul>
+                <li v-for="wing in wishlist.wing_items" :key="wing.id">
+                  {{ lang === 'hu' ? wing.wing_name_hu : wing.wing_name_en }} ({{ wing.wing_color }}) – {{ wing.quantity }} db
+                </li>
+              </ul>
             </li>
           </ul>
         </li>
-        <li v-if="wishlist.wing_items && wishlist.wing_items.length">
-          <b>Wing items:</b>
-          <ul>
-            <li v-for="wing in wishlist.wing_items" :key="wing.id">
-              {{ wing.wing_name }} ({{ wing.wing_color }}) – {{ wing.quantity }} db
-            </li>
-          </ul>
-        </li>
-        </ul>
-      </li>
-    </ul>
+      </ul>
     </div>
-
   </div>
 </template>
 
 <script>
-      // vagy "@/api", ha ott van!
+import { mapState, mapActions } from 'vuex'
+import translations from '@/translations'
 import { fetchProfile, fetchWishlists, logoutUser } from "@/api/api"
 
 export default {
@@ -52,21 +61,26 @@ export default {
       wishlists: [],
     }
   },
+  computed: {
+    ...mapState(['lang']),
+    t() {
+      return key => translations[this.lang]?.[key] || key
+    }
+  },
   async mounted() {
-    // Lekérjük a profil adatokat
     this.profile = await fetchProfile()
-    // Csak akkor töltjük le a wishlisteket, ha chief vagy admin a user:
     if (["chief", "admin"].includes(this.profile.role)) {
       this.wishlists = await fetchWishlists()
     }
   },
   methods: {
+    ...mapActions(['setLang']),
     logout() {
       logoutUser()
       this.$router.push({ name: "login" })
     },
     editWishlist(id) {
-    this.$router.push({ name: "wishlist-edit", params: { id } })
+      this.$router.push({ name: "wishlist-edit", params: { id } })
     },
   }
 }
