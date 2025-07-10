@@ -2,6 +2,13 @@
   <div>
     <h2>Event Details</h2>
     <button @click="goToEventEdit" style="margin-bottom: 1rem;">Edit Event</button>
+    <button
+      v-if="eventDetails && eventDetails.arenas && eventDetails.arenas.length > 0"
+      @click="goToEventWishlists"
+      style="margin-bottom: 2rem; margin-left:12px; padding:5px 20px; border-radius:7px; border:1px solid #bbb; background:#e9f5fd; color:#185eb8; font-weight:bold;"
+    >
+      View all Wishlists for this Event
+    </button>
     <div v-if="eventDetails">
       <h3>Arenas</h3>
       <div v-for="arenaObj in eventDetails.arenas" :key="arenaObj.arena.id" style="margin-bottom: 2rem;">
@@ -87,11 +94,13 @@ export default {
   data() {
     return { eventDetails: null }
   },
-  mounted() {
-    fetchEventDetails(this.id)
-      .then(res => { this.eventDetails = res.data; })
-      .catch(err => { console.error(err); });
-  },
+ mounted() {
+  fetchEventDetails(this.id)
+    .then(res => {
+      this.eventDetails = res.data;
+    })
+    .catch(err => { console.error(err); });
+},
   methods: {
     fullImageUrl(path) {
       if (!path) return "";
@@ -103,7 +112,25 @@ export default {
     },
     goToEventEdit() {
       this.$router.push({name: 'event-edit', params: {eventId: this.id}});
-    }
+    },
+  goToEventWishlists() {
+  // Az első aréna event mezőjéből olvasd ki az id-t!
+  if (
+    this.eventDetails &&
+    this.eventDetails.arenas &&
+    this.eventDetails.arenas.length > 0 &&
+    this.eventDetails.arenas[0].arena &&
+    this.eventDetails.arenas[0].arena.event
+  ) {
+    const eventId = this.eventDetails.arenas[0].arena.event;
+    this.$router.push({
+      name: 'event-wishlists',
+      params: { eventId: String(eventId) }
+    });
+  } else {
+    console.log("No eventId found in eventDetails!");
+  }
+}
   }
 }
 </script>

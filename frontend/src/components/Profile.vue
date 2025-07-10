@@ -4,7 +4,7 @@
     <div v-if="profile">
       <p><strong>Username:</strong> {{ profile.username }}</p>
       <p><strong>Email:</strong> {{ profile.email }}</p>
-      <p><strong>Role:</strong> {{ profile.role }}</p>
+      <button @click="logout">Logout</button>
     </div>
 
     <div v-if="wishlists.length">
@@ -12,6 +12,9 @@
     <ul>
       <li v-for="wishlist in wishlists" :key="wishlist.id">
         <strong>{{ wishlist.arena_name }}</strong>
+        <div v-if="wishlist.note"><i>Note:</i> {{ wishlist.note }}</div>
+            <button @click="editWishlist(wishlist.id)">Edit</button>
+
         <ul>
           <li v-if="wishlist.pole_items && wishlist.pole_items.length">
           <b>Pole items:</b>
@@ -33,7 +36,7 @@
       </li>
     </ul>
     </div>
-    <button @click="logout">Logout</button>
+
   </div>
 </template>
 
@@ -62,7 +65,10 @@ export default {
       logoutUser()
       this.$router.push({ name: "login" })
     },
-  },
+    editWishlist(id) {
+    this.$router.push({ name: "wishlist-edit", params: { id } })
+    },
+  }
 }
 </script>
 

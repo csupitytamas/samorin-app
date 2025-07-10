@@ -174,3 +174,17 @@ export function createPole(data) {
 export function createWings(data) {
   return axios.post(API_BASE + 'wings/', data)
 }
+
+export function wishList(data) {
+  return axios.post(API_BASE + 'wishlist/', data)
+}
+export function fetchWishlist(id) {
+  return axios.get(API_BASE + `wishlist/${id}/`)
+}
+
+export function updateWishlist(id, data) {
+  return axios.patch(API_BASE + `wishlist/${id}/`, data)
+}
+export function fetchEventWishlists(eventId) {
+  return axios.get(API_BASE + `events/${eventId}/all_wishlists/`)
+}

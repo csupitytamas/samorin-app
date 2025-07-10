@@ -9,6 +9,8 @@ from .serializers import EventSerializer, ArenaSerializer, PoleLocationSerialize
 from django.utils import timezone
 from .models import ArchivedEvent, ArchivedArena, ArchivedPoleLocation, ArchivedWingLocation
 from .permissions import IsAdminOrReadOnly, IsCrewOrAdmin, IsChiefOrAdmin
+from wishlist.serializers import WishlistSerializer
+from wishlist.models import Wishlist
 
 class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
@@ -71,6 +73,25 @@ class EventViewSet(viewsets.ModelViewSet):
         event.is_active = False
         event.save()
         return Response({'detail': 'Event archived, all stock returned to warehouse.'})
+
+    @action(detail=True, methods=['get'])
+    def all_wishlists(self, request, pk=None):
+        event = self.get_object()
+        arenas = Arena.objects.filter(event=event)
+        data = []
+        for arena in arenas:
+            wishlists = Wishlist.objects.filter(arena=arena)
+            data.append({
+                "arena": {
+                    "id": arena.id,
+                    "name": arena.name,
+                },
+                "wishlists": WishlistSerializer(wishlists, many=True).data
+            })
+        return Response({
+            "event": event.name,
+            "arenas": data
+        })
 
 class ArenaViewSet(viewsets.ModelViewSet):
     permission_classes = [IsCrewOrAdmin]

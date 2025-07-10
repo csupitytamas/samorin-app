@@ -15,6 +15,8 @@ import UserAdmin from "@/components/UserAdmin.vue"
 import PoleCreate from "@/components/PoleCreate.vue"
 import WingsCreate from "@/components/WingsCreate.vue"
 import Profile from "@/components/Profile.vue";
+import WishListEdit from "@/components/WishListEdit.vue";
+import EventWishlists from "@/components/EventWishlists.vue";
 
 const routes = [
     {
@@ -64,7 +66,14 @@ const routes = [
   { path: '/admin/users', name: 'user-admin', component: UserAdmin },
   { path: '/admin/pole', name: 'pole-create', component: PoleCreate },
   { path: '/admin/wings', name: 'wings-create', component: WingsCreate },
-  { path: '/profile', name: 'profile', component: Profile }
+  { path: '/profile', name: 'profile', component: Profile },
+  { path: '/wishlist/edit/:id', name: 'wishlist-edit', component: WishListEdit, props: true},
+  {
+  path: '/events/:eventId/wishlists',
+  name: 'event-wishlists',
+  component: EventWishlists,
+  props: true
+  }
 
 
 ]
