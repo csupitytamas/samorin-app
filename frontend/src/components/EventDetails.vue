@@ -1,23 +1,31 @@
 <template>
   <div>
     <h2>{{ t('eventDetails') }}</h2>
-    <button @click="goToEventEdit" style="margin-bottom: 1rem;">{{ t('editEvent') }}</button>
+    <!-- Csak adminnak -->
+    <button v-if="isAdmin" @click="goToEventEdit" style="margin-bottom: 1rem;">{{ t('editEvent') }}</button>
+
+    <!-- Chief és Crew látja a wishlisteket -->
     <button
-      v-if="eventDetails && eventDetails.arenas && eventDetails.arenas.length > 0"
+      v-if="(isAdmin || isChief || isCrew) && eventDetails && eventDetails.arenas && eventDetails.arenas.length > 0"
       @click="goToEventWishlists"
       style="margin-bottom: 2rem; margin-left:12px; padding:5px 20px; border-radius:7px; border:1px solid #bbb; background:#e9f5fd; color:#185eb8; font-weight:bold;"
     >
       {{ t('viewAllWishlists') }}
     </button>
+
     <div v-if="eventDetails">
       <h3>{{ t('arenas') }}</h3>
       <div v-for="arenaObj in eventDetails.arenas" :key="arenaObj.arena.id" style="margin-bottom: 2rem;">
         <h4>
-          <a @click.prevent="goToArenaEdit(arenaObj.arena.id)" href="#" style="cursor:pointer; color:blue; text-decoration:underline;">
+          <!-- Crew tud szerkeszteni -->
+          <a v-if="(isAdmin ||isCrew) " @click.prevent="goToArenaEdit(arenaObj.arena.id)" href="#" style="cursor:pointer; color:blue; text-decoration:underline;">
             {{ arenaObj.arena.name }}
           </a>
+          <!-- Többiek csak simán látják -->
+          <span v-else>
+            {{ arenaObj.arena.name }}
+          </span>
         </h4>
-
         <!-- POLES TABLE -->
         <table border="1" cellpadding="6" style="margin-bottom:1rem; min-width:500px;">
           <thead>
@@ -98,6 +106,9 @@ export default {
   },
   computed: {
     ...mapState(['lang']),
+    isAdmin() { return this.$store.getters.isAdmin },
+    isChief() { return this.$store.getters.isChief },
+    isCrew() { return this.$store.getters.isCrew },
     t() {
       return key => translations[this.lang]?.[key] || key
     }

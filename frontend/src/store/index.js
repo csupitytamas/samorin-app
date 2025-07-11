@@ -23,8 +23,11 @@ export default createStore({
       state.user = user
       if (user) {
         localStorage.setItem('user', JSON.stringify(user))
+        // opcionális, ha sessionStorage-be is akarod:
+        // sessionStorage.setItem('user', JSON.stringify(user))
       } else {
         localStorage.removeItem('user')
+        sessionStorage.removeItem('user') // ha netán ott is volt!
       }
     }
   },
@@ -36,6 +39,15 @@ export default createStore({
       commit('SET_USER', user)
     },
     logout({ commit }) {
+      // Tokenek törlése minden storage-ból
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      sessionStorage.removeItem('access_token')
+      sessionStorage.removeItem('refresh_token')
+      // User törlése storage-ból is
+      localStorage.removeItem('user')
+      sessionStorage.removeItem('user')
+      // Store törlés
       commit('SET_USER', null)
     }
   },

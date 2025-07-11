@@ -49,9 +49,10 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import {mapState, mapActions} from 'vuex'
 import translations from '@/translations'
 import { fetchProfile, fetchWishlists, logoutUser } from "@/api/api"
+
 
 export default {
   name: "ProfilePage",
@@ -73,16 +74,17 @@ export default {
       this.wishlists = await fetchWishlists()
     }
   },
-  methods: {
-    ...mapActions(['setLang']),
-    logout() {
-      logoutUser()
-      this.$router.push({ name: "login" })
-    },
-    editWishlist(id) {
-      this.$router.push({ name: "wishlist-edit", params: { id } })
-    },
-  }
+     methods: {
+      ...mapActions(['setLang']),
+      logout() {
+        logoutUser()
+        this.$store.dispatch('logout')  // store user-t is törli!
+        this.$router.push({ name: "login" })
+      },
+      editWishlist(id) {
+        this.$router.push({ name: "wishlist-edit", params: { id } })
+      },
+    }
 }
 </script>
 

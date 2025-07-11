@@ -100,6 +100,11 @@ export default {
     couldNotLoadWishlist: "Nem sikerült betölteni a kívánságlistát",
     wishlistUpdated: "Kívánságlista frissítve!",
     updateFailed: "Frissítés sikertelen!",
+    events: "Események",
+    wishlistCreate: "Wishlist készítés",
+    eventCreate: "Esemény létrehozás",
+    langHu: "Magyar",
+    langEn: "English",
 
   },
   en: {
@@ -201,5 +206,10 @@ export default {
     couldNotLoadWishlist: "Could not load wishlist",
     wishlistUpdated: "Wishlist updated!",
     updateFailed: "Update failed!",
+    events: "Events",
+    wishlistCreate: "Create wishlist",
+    arenaCreate: "Create Arena",
+    eventCreate: "Create Event",
+
   }
 }

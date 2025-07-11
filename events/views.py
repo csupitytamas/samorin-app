@@ -12,10 +12,18 @@ from .permissions import IsAdminOrReadOnly, IsCrewOrAdmin, IsChiefOrAdmin
 from wishlist.serializers import WishlistSerializer
 from wishlist.models import Wishlist
 
+
+
 class EventViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     queryset = Event.objects.filter(is_active=True)
     serializer_class = EventSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    def get_queryset(self):
+        return Event.objects.filter(is_active=True)
 
     @action(detail=True, methods=['get'])
     def full_details(self, request, pk=None):
@@ -126,3 +134,12 @@ class ActiveArenaViewSet(viewsets.ReadOnlyModelViewSet):
         archived_ids = ArchivedArena.objects.values_list('original_arena_id', flat=True)
         # Csak azok az arénák, amik nincsenek archiválva, ÉS az eventjük aktív/élő
         return Arena.objects.exclude(id__in=archived_ids).filter(event__is_active=True, event__is_archived=False)
+
+
+def auto_archive_events():
+    now = timezone.now().date()
+    outdated_events = Event.objects.filter(is_archived=False, end_date__lt=now)
+    for event in outdated_events:
+        event.is_archived = True
+        event.is_active = False
+        event.save()

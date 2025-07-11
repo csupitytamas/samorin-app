@@ -5,6 +5,7 @@ from .models import Event, Arena, PoleLocation, WingLocation, ArchivedEvent, Arc
 from warehouse.models import Pole, Wings
 
 class EventSerializer(serializers.ModelSerializer):
+    created_by = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Event
         fields = '__all__'

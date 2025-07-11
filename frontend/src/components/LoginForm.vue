@@ -25,9 +25,7 @@
 </template>
 
 <script>
-import { loginUser } from "@/api/api"
-
-
+import { loginUser, fetchProfile } from "@/api/api"
 
 export default {
   name: 'LoginForm',
@@ -39,29 +37,36 @@ export default {
       error: '',
     }
   },
-  methods: {
-  async handleLogin() {
-    this.error = ''
-    try {  // ← EZ HIÁNYZOTT!
-      const res = await loginUser({
-        username: this.username,
-        password: this.password,
-      })
-      // Store tokens: localStorage if rememberMe, else sessionStorage
-      if (this.rememberMe) {
-        localStorage.setItem('access_token', res.data.access)
-        localStorage.setItem('refresh_token', res.data.refresh)
-      } else {
-        sessionStorage.setItem('access_token', res.data.access)
-        sessionStorage.setItem('refresh_token', res.data.refresh)
+   methods: {
+    async handleLogin() {
+      this.error = ''
+      try {
+        const res = await loginUser({
+          username: this.username,
+          password: this.password,
+        })
+        // Store tokens: localStorage if rememberMe, else sessionStorage
+        if (this.rememberMe) {
+          localStorage.setItem('access_token', res.data.access)
+          localStorage.setItem('refresh_token', res.data.refresh)
+        } else {
+          sessionStorage.setItem('access_token', res.data.access)
+          sessionStorage.setItem('refresh_token', res.data.refresh)
+        }
+
+        // 1. PROFIL LEKÉRÉS
+        const user = await fetchProfile()
+
+        // 2. STORE-BA MENTÉS (ez fontos!)
+        this.$store.dispatch('setUser', user)
+
+        // 3. Redirect
+        this.$router.push({ name: 'event-list' })
+      } catch (err) {
+        this.error = 'Invalid login credentials!'
       }
-      // Redirect to main page (adjust to your routes)
-      this.$router.push({ name: 'event-list' })
-    } catch (err) {
-      this.error = 'Invalid login credentials!'
-    }
-  },
-}
+    },
+  }
 }
 </script>
 
