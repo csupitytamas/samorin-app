@@ -1,24 +1,23 @@
 <template>
-  <div>
+  <div class="container centered">
     <h2>{{ t('createEvent') }}</h2>
-    <form @submit.prevent="submitEvent">
-      <div>
+    <form @submit.prevent="submitEvent" class="form-box">
+      <div class="form-row">
         <label>{{ t('name') }}:</label>
         <input v-model="form.name" required />
       </div>
-      <div>
+      <div class="form-row">
         <label>{{ t('startDate') }}:</label>
         <input type="date" v-model="form.start_date" required />
       </div>
-      <div>
+      <div class="form-row">
         <label>{{ t('endDate') }}:</label>
         <input type="date" v-model="form.end_date" required />
       </div>
-      <!-- Itt lehet további mezőket hozzáadni, pl. is_active, is_archived -->
       <button type="submit">{{ t('create') }}</button>
     </form>
-    <div v-if="successMessage" style="color:green">{{ successMessage }}</div>
-    <div v-if="errorMessage" style="color:red">{{ errorMessage }}</div>
+    <div v-if="successMessage" class="success-msg">{{ successMessage }}</div>
+    <div v-if="errorMessage" class="error-msg">{{ errorMessage }}</div>
   </div>
 </template>
 

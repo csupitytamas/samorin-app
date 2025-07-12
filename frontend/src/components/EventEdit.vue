@@ -1,35 +1,34 @@
 <template>
-  <div>
+  <div class="container centered">
     <h2>{{ t('editEvent') }}</h2>
-    <form @submit.prevent="saveEvent">
-      <div>
+    <form @submit.prevent="saveEvent" class="form-box">
+      <div class="form-row">
         <label>{{ t('name') }}:</label>
         <input v-model="event.name" required />
       </div>
-      <div>
+      <div class="form-row">
         <label>{{ t('startDate') }}:</label>
         <input type="date" v-model="event.start_date" required />
       </div>
-      <div>
+      <div class="form-row">
         <label>{{ t('endDate') }}:</label>
         <input type="date" v-model="event.end_date" required />
       </div>
       <button type="submit">{{ t('save') }}</button>
-      <button @click="archiveEvent" type="button" style="color:orange;">{{ t('closeEvent') }}</button>
+      <button @click="archiveEvent" type="button" class="danger-btn">{{ t('closeEvent') }}</button>
     </form>
 
-    <div v-if="successMessage" style="color:green; margin-top:10px;">{{ successMessage }}</div>
-    <div v-if="errorMessage" style="color:red; margin-top:10px;">{{ errorMessage }}</div>
+    <div v-if="successMessage" class="success-msg">{{ successMessage }}</div>
+    <div v-if="errorMessage" class="error-msg">{{ errorMessage }}</div>
 
     <h3>{{ t('arenas') }}</h3>
     <ul>
-      <li v-for="arena in arenas" :key="arena.id" style="margin-bottom: 10px;">
+     <li v-for="arena in arenas" :key="arena.id" class="table-row-card inline-form">
         <template v-if="editingArenaId === arena.id">
           <input
             v-model="arenaNewName"
             @keyup.enter="saveArenaName(arena)"
             @blur="saveArenaName(arena)"
-            style="width:120px;"
           />
           <button @click="saveArenaName(arena)">{{ t('save') }}</button>
           <button @click="cancelEditArena">{{ t('cancel') }}</button>
@@ -39,7 +38,7 @@
           <button @click="startEditArena(arena)">{{ t('edit') }}</button>
         </template>
       </li>
-      <li v-if="arenas.length === 0" style="color:gray;">{{ t('noArenas') }}</li>
+      <li v-if="arenas.length === 0" class="muted">{{ t('noArenas') }}</li>
     </ul>
   </div>
 </template>

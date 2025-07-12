@@ -1,44 +1,35 @@
 <template>
-  <div>
-    <h2>{{ t('runningEvents') }}</h2>
-    <ul>
-      <li v-for="event in runningEvents" :key="event.id" @click="goToEventDetails(event)" style="cursor:pointer;">
-        <b>{{ lang === 'hu' ? event.name_hu || event.name : event.name_en || event.name }}</b>
-        <span> ({{ event.start_date }} - {{ event.end_date }})</span>
-      </li>
-      <li v-if="runningEvents.length === 0" style="color:gray;">{{ t('noRunningEvents') }}</li>
-    </ul>
-
-    <h2>{{ t('upcomingEvents') }}</h2>
-    <ul>
-      <li v-for="event in upcomingEvents" :key="event.id" @click="goToEventDetails(event)" style="cursor:pointer;">
-        <b>{{ lang === 'hu' ? event.name_hu || event.name : event.name_en || event.name }}</b>
-        <span> ({{ event.start_date }} - {{ event.end_date }})</span>
-      </li>
-      <li v-if="upcomingEvents.length === 0" style="color:gray;">{{ t('noUpcomingEvents') }}</li>
-    </ul>
-
-    <div v-if="eventDetails">
-      <h3>{{ t('arenas') }}:</h3>
-      <div v-for="arenaObj in eventDetails.arenas" :key="arenaObj.arena.id" style="margin-bottom: 1.5rem;">
-        <b>{{ lang === 'hu' ? arenaObj.arena.name_hu || arenaObj.arena.name : arenaObj.arena.name_en || arenaObj.arena.name }}</b>
+  <div class="container">
+    <div class="box-border">
+      <h2>{{ t('runningEvents') }}</h2>
+      <div v-for="event in runningEvents"
+           :key="event.id"
+           class="event-item"
+           @click="goToEventDetails(event)">
         <div>
-          <span>{{ t('poles') }}:</span>
-          <ul>
-            <li v-for="poleLoc in arenaObj.poles" :key="poleLoc.id">
-              {{ lang === 'hu' ? poleLoc.pole.name_hu : poleLoc.pole.name_en }} ({{ poleLoc.quantity }})
-            </li>
-          </ul>
+          <b>{{ lang === 'hu' ? event.name_hu || event.name : event.name_en || event.name }}</b>
         </div>
-        <div>
-          <span>{{ t('wings') }}:</span>
-          <ul>
-            <li v-for="wingLoc in arenaObj.wings" :key="wingLoc.id">
-              {{ lang === 'hu' ? wingLoc.wing.name_hu : wingLoc.wing.name_en }} ({{ wingLoc.quantity }})
-            </li>
-          </ul>
+        <div class="event-item-date">
+          {{ event.start_date }} - {{ event.end_date }}
         </div>
       </div>
+      <div v-if="runningEvents.length === 0" class="muted">{{ t('noRunningEvents') }}</div>
+    </div>
+
+    <div class="box-border">
+      <h2>{{ t('upcomingEvents') }}</h2>
+      <div v-for="event in upcomingEvents"
+           :key="event.id"
+           class="event-item"
+           @click="goToEventDetails(event)">
+        <div>
+          <b>{{ lang === 'hu' ? event.name_hu || event.name : event.name_en || event.name }}</b>
+        </div>
+        <div class="event-item-date">
+          {{ event.start_date }} - {{ event.end_date }}
+        </div>
+      </div>
+      <div v-if="upcomingEvents.length === 0" class="muted">{{ t('noUpcomingEvents') }}</div>
     </div>
   </div>
 </template>
