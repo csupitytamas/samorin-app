@@ -1,31 +1,40 @@
 <template>
-  <div class="login">
-    <h2>Login</h2>
-    <form @submit.prevent="handleLogin">
-      <div>
-        <label>Username:</label>
-        <input v-model="username" required />
+  <div class="container" style="max-width: 400px;">
+    <div class="box-border">
+      <h2 style="text-align: center;">{{ t('login') }}</h2>
+      <form @submit.prevent="handleLogin" class="inline-form column">
+        <div style="margin-bottom: 1rem;">
+          <input v-model="username" :placeholder="t('username')" required />
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <input v-model="password" type="password" :placeholder="t('password')" required />
+        </div>
+    <div class="form-group" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin: 1rem 0;">
+  <div class="checkbox-wrapper-29">
+    <label class="checkbox">
+      <input type="checkbox" class="checkbox__input" v-model="rememberMe" />
+      <span class="checkbox__label"></span>
+    </label>
+  </div>
+  <label @click="rememberMe = !rememberMe" style="cursor: pointer;">{{   t('keepLoggedIn') }}</label>
+</div>
+        <button type="submit" style="width:100%;">{{ t('login') }}</button>
+      </form>
+      <div v-if="error" style="color:red; margin-top:1rem; text-align:center;">
+        {{ error }}
       </div>
-      <div>
-        <label>Password:</label>
-        <input v-model="password" type="password" required />
-      </div>
-      <div>
-        <input type="checkbox" id="rememberMe" v-model="rememberMe" />
-        <label for="rememberMe">Keep me logged in</label>
-      </div>
-      <button type="submit">Login</button>
-      <div v-if="error" class="error">{{ error }}</div>
-    </form>
-       <p>
-        Don't have an account?
-        <router-link :to="{ name: 'register' }">Register here!</router-link>
-      </p>
+    </div>
+    <p style="text-align:center; margin-top:1.5rem;">
+      {{ t('noAccount') }}
+      <router-link :to="{ name: 'register' }">{{ t('registerHere') }}</router-link>
+    </p>
   </div>
 </template>
 
 <script>
 import { loginUser, fetchProfile } from "@/api/api"
+import { mapState } from "vuex"
+import translations from "@/translations"
 
 export default {
   name: 'LoginForm',
@@ -37,7 +46,13 @@ export default {
       error: '',
     }
   },
-   methods: {
+  computed: {
+    ...mapState(['lang']),
+    t() {
+      return key => translations[this.lang]?.[key] || key
+    }
+  },
+  methods: {
     async handleLogin() {
       this.error = ''
       try {
@@ -45,7 +60,6 @@ export default {
           username: this.username,
           password: this.password,
         })
-        // Store tokens: localStorage if rememberMe, else sessionStorage
         if (this.rememberMe) {
           localStorage.setItem('access_token', res.data.access)
           localStorage.setItem('refresh_token', res.data.refresh)
@@ -53,25 +67,13 @@ export default {
           sessionStorage.setItem('access_token', res.data.access)
           sessionStorage.setItem('refresh_token', res.data.refresh)
         }
-
-        // 1. PROFIL LEKÉRÉS
         const user = await fetchProfile()
-
-        // 2. STORE-BA MENTÉS (ez fontos!)
         this.$store.dispatch('setUser', user)
-
-        // 3. Redirect
         this.$router.push({ name: 'event-list' })
       } catch (err) {
-        this.error = 'Invalid login credentials!'
+        this.error = this.t('invalidLogin') || 'Invalid login credentials!'
       }
     },
   }
 }
 </script>
-
-<style>
-.error {
-  color: red;
-}
-</style>

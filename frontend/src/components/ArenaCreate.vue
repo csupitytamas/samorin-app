@@ -1,25 +1,33 @@
 <template>
-  <div>
+  <div class="container">
     <h2>{{ t('createArena') }}</h2>
-    <form @submit.prevent="createArena">
-      <div>
-        <label>{{ t('arenaName') }}:</label>
-        <input v-model="arena.name" required />
+    <div class="box-border">
+      <form @submit.prevent="createArena" class="inline-form row">
+        <div style="flex:1; min-width:200px;">
+          <input v-model="arena.name" :placeholder="t('arenaName')" required />
+        </div>
+        <button type="submit">{{ t('createArenaButton') }}</button>
+      </form>
+      <div v-if="successMessage" style="color:green; margin-top:10px; text-align:center;">
+        {{ successMessage }}
       </div>
-      <button type="submit">{{ t('createArenaButton') }}</button>
-    </form>
-    <div v-if="successMessage" style="color:green">{{ successMessage }}</div>
-    <div v-if="errorMessage" style="color:red">{{ errorMessage }}</div>
+      <div v-if="errorMessage" style="color:red; margin-top:10px; text-align:center;">
+        {{ errorMessage }}
+      </div>
+    </div>
 
-    <hr />
     <h3>{{ t('existingArenas') }}</h3>
-    <ul>
-      <li v-for="arena in arenas" :key="arena.id">
-        {{ arena.name }}
-        <button @click="goToEditArena(arena)" style="margin-left: 10px;">{{ t('edit') }}</button>
-      </li>
-      <li v-if="arenas.length === 0" style="color:gray;">{{ t('noArenasYet') }}</li>
-    </ul>
+    <div class="box-border" v-if="arenas.length > 0">
+      <ul style="list-style:none; padding:0;">
+        <li v-for="arena in arenas" :key="arena.id" style="margin:8px 0; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-weight:bold;">{{ arena.name }}</span>
+          <button @click="goToEditArena(arena)" style="padding: 4px 12px;">{{ t('edit') }}</button>
+        </li>
+      </ul>
+    </div>
+    <div v-else class="muted" style="text-align:center; margin-top:1rem;">
+      {{ t('noArenasYet') }}
+    </div>
   </div>
 </template>
 

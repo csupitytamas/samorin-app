@@ -1,37 +1,45 @@
 <template>
-  <div>
+  <div class="container">
     <h2>Add new Pole</h2>
-    <form @submit.prevent="addPole" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px; max-width: 370px;">
-      <label>
-        Hungarian name:<br>
+    <form @submit.prevent="addPole" enctype="multipart/form-data" class="form-box">
+      <div class="form-row">
+        <label>Hungarian name:</label>
         <input v-model="name_hu" required />
-      </label>
-      <label>
-        English name:<br>
+      </div>
+      <div class="form-row">
+        <label>English name:</label>
         <input v-model="name_en" required />
-      </label>
-      <label>
-        Color:<br>
+      </div>
+      <div class="form-row">
+        <label>Color:</label>
         <input v-model="color" required />
-      </label>
-      <label>
-        Number:<br>
+      </div>
+      <div class="form-row">
+        <label>Number:</label>
         <input v-model.number="number" type="number" min="1" required />
-      </label>
-      <label>
-        Length (m):<br>
+      </div>
+      <div class="form-row">
+        <label>Length (m):</label>
         <select v-model.number="length" required>
           <option :value="3.5">3.5</option>
           <option :value="3">3</option>
           <option :value="2.5">2.5</option>
           <option :value="2">2</option>
         </select>
-      </label>
-      <label>
-        Picture:<br>
+      </div>
+      <div class="form-row">
+        <label>Picture:</label>
         <input type="file" @change="onFileChange" ref="fileInput" />
-      </label>
-      <button type="submit">Add Pole</button>
+      </div>
+      <div class="form-row" style="text-align: right;">
+        <button type="submit">Add Pole</button>
+      </div>
+      <div v-if="successMessage" style="color: var(--accent-color); margin-top: 0.8rem;">
+        {{ successMessage }}
+      </div>
+      <div v-if="errorMessage" style="color: #ff3860; margin-top: 0.8rem;">
+        {{ errorMessage }}
+      </div>
     </form>
   </div>
 </template>
@@ -46,8 +54,10 @@ export default {
       name_en: '',
       color: '',
       number: 1,
-      length: 3.5, // alapértelmezett
+      length: 3.5,
       picture: null,
+      successMessage: '',
+      errorMessage: ''
     }
   },
   methods: {
@@ -65,8 +75,18 @@ export default {
       if (this.picture) {
         formData.append("picture", this.picture)
       }
-      await createPole(formData)
-      alert('Pole added!')
+
+      try {
+        await createPole(formData)
+        this.successMessage = "Pole added!"
+        this.errorMessage = ""
+        this.resetForm()
+      } catch (err) {
+        this.successMessage = ""
+        this.errorMessage = "Failed to add pole!"
+      }
+    },
+    resetForm() {
       this.name_hu = ''
       this.name_en = ''
       this.color = ''

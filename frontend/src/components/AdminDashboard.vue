@@ -1,10 +1,12 @@
 <template>
-  <div class="admin-dashboard">
+  <div class="container">
     <h2>{{ t('adminDashboard') }}</h2>
-    <div class="admin-buttons">
-      <button @click="goTo('user-admin')">{{ t('userAdmin') }}</button>
-      <button @click="goTo('pole-create')">{{ t('addPole') }}</button>
-      <button @click="goTo('wings-create')">{{ t('addWings') }}</button>
+    <div class="box centered" style="margin-top:2rem;">
+      <div class="admin-buttons">
+        <button @click="goTo('user-admin')">{{ t('userAdmin') }}</button>
+        <button @click="goTo('pole-create')">{{ t('addPole') }}</button>
+        <button @click="goTo('wings-create')">{{ t('addWings') }}</button>
+      </div>
     </div>
   </div>
 </template>
@@ -29,14 +31,16 @@ export default {
 }
 </script>
 
-<style>
-.admin-dashboard {
-  text-align: center;
-  margin-top: 2rem;
+<style scoped>
+.admin-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
-.admin-buttons button {
-  margin: 1rem;
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
+@media (min-width: 600px) {
+  .admin-buttons {
+    flex-direction: row;
+  }
 }
 </style>

@@ -1,172 +1,197 @@
 <template>
-  <div>
-    <!-- ALREADY ASSIGNED POLES -->
+  <div class="container">
     <h3>{{ t('assignedPoles') }}</h3>
-    <table border="1" cellpadding="6" style="margin-bottom:1.5rem; min-width:500px;">
-      <thead>
-        <tr>
-          <th>{{ t('name') }}</th>
-          <th>{{ t('color') }}</th>
-          <th>{{ t('length') }}</th>
-          <th>{{ t('quantity') }}</th>
-          <th>{{ t('image') }}</th>
-          <th>{{ t('delete') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="poleLoc in assignedPoles" :key="poleLoc.id">
-          <td>{{ lang === 'hu' ? poleLoc.pole.name_hu : poleLoc.pole.name_en }}</td>
-          <td>{{ poleLoc.pole.color }}</td>
-          <td>{{ poleLoc.pole.length }}</td>
-          <td>{{ poleLoc.quantity }}</td>
-          <td>
-            <img v-if="poleLoc.pole.picture" :src="fullImageUrl(poleLoc.pole.picture)" alt="Pole" style="max-width:60px; max-height:60px;">
-          </td>
-          <td>
-            <button v-if="isAdmin || isCrew" @click="deletePoleLoc(poleLoc)">
-              {{ t('delete') }}
-            </button>
-          </td>
-        </tr>
-        <tr v-if="assignedPoles.length === 0">
-          <td colspan="6" style="color:gray; text-align:center;">{{ t('noPoles') }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>{{ t('name') }}</th>
+            <th>{{ t('color') }}</th>
+            <th>{{ t('length') }}</th>
+            <th>{{ t('quantity') }}</th>
+            <th>{{ t('image') }}</th>
+            <th>{{ t('delete') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="poleLoc in assignedPoles" :key="poleLoc.id">
+            <td>{{ lang === 'hu' ? poleLoc.pole.name_hu : poleLoc.pole.name_en }}</td>
+            <td>{{ poleLoc.pole.color }}</td>
+            <td>{{ poleLoc.pole.length }}</td>
+            <td>{{ poleLoc.quantity }}</td>
+            <td>
+              <img
+                v-if="poleLoc.pole.picture"
+                :src="fullImageUrl(poleLoc.pole.picture)"
+                alt="Pole"
+                class="table-image clickable-image"
+                @click="fullscreenImage = fullImageUrl(poleLoc.pole.picture)"
+              />
+            </td>
+            <td>
+              <button
+                v-if="isAdmin || isCrew"
+                @click="deletePoleLoc(poleLoc)"
+                class="trash-button"
+                title="Delete"
+              >🗑️</button>
+            </td>
+          </tr>
+          <tr v-if="assignedPoles.length === 0">
+            <td colspan="6" class="muted" style="text-align:center;">{{ t('noPoles') }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <h3>{{ t('assignedWings') }}</h3>
-    <table border="1" cellpadding="6" style="margin-bottom:1.5rem; min-width:400px;">
-      <thead>
-        <tr>
-          <th>{{ t('name') }}</th>
-          <th>{{ t('color') }}</th>
-          <th>{{ t('quantity') }}</th>
-          <th>{{ t('image') }}</th>
-          <th>{{ t('delete') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="wingLoc in assignedWings" :key="wingLoc.id">
-          <td>{{ lang === 'hu' ? wingLoc.wing.name_hu : wingLoc.wing.name_en }}</td>
-          <td>{{ wingLoc.wing.color }}</td>
-          <td>{{ wingLoc.quantity }}</td>
-          <td>
-            <img v-if="wingLoc.wing.picture" :src="fullImageUrl(wingLoc.wing.picture)" alt="Kitörő" style="max-width:60px; max-height:60px;">
-          </td>
-          <td>
-            <button v-if="isAdmin || isCrew" @click="deleteWingsLoc(wingLoc)">
-              {{ t('delete') }}
-            </button>
-          </td>
-        </tr>
-        <tr v-if="assignedWings.length === 0">
-          <td colspan="5" style="color:gray; text-align:center;">{{ t('noWings') }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>{{ t('name') }}</th>
+            <th>{{ t('color') }}</th>
+            <th>{{ t('quantity') }}</th>
+            <th>{{ t('image') }}</th>
+            <th>{{ t('delete') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="wingLoc in assignedWings" :key="wingLoc.id">
+            <td>{{ lang === 'hu' ? wingLoc.wing.name_hu : wingLoc.wing.name_en }}</td>
+            <td>{{ wingLoc.wing.color }}</td>
+            <td>{{ wingLoc.quantity }}</td>
+            <td>
+             <img
+                  v-if="wingLoc.wing.picture"
+                  :src="fullImageUrl(wingLoc.wing.picture)"
+                  alt="Wing"
+                  class="table-image clickable-image"
+                  @click="fullscreenImage = fullImageUrl(wingLoc.wing.picture)"
+                />
+            </td>
+            <td>
+              <button
+                v-if="isAdmin || isCrew"
+                @click="deleteWingsLoc(wingLoc)"
+                class="trash-button"
+                title="Delete"
+              >🗑️</button>
+            </td>
+          </tr>
+          <tr v-if="assignedWings.length === 0">
+            <td colspan="5" class="muted" style="text-align:center;">{{ t('noWings') }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <!-- ÜZENETEK -->
-    <div v-if="successMessage" style="color:green; margin-top:10px;">{{ successMessage }}</div>
-    <div v-if="errorMessage" style="color:red; margin-top:10px;">{{ errorMessage }}</div>
-    <!-- GRID nézet, checkbox-szal és egyszerre assign-nal -->
     <form v-if="isAdmin || isCrew" @submit.prevent="assignGridSelected" style="margin-top: 3rem;">
-      <h3 style="font-weight:bold;">{{ t('availableGrid') }}</h3>
-      <div style="margin-bottom: 16px; display: flex; gap: 12px;">
-        <input
-          v-model="gridSearch"
-          type="text"
-          :placeholder="t('searchByName')"
-          style="padding:4px 10px; border-radius:4px; border:1px solid #bbb;"
-        />
-        <select v-model="gridColor" style="padding:4px 10px; border-radius:4px;">
-          <option value="">{{ t('allColors') }}</option>
-          <option v-for="color in gridAvailableColors" :key="color" :value="color">{{ color }}</option>
-        </select>
-        <select v-model="gridType" style="padding:4px 10px; border-radius:4px;">
-          <option value="">{{ t('both') }}</option>
-          <option value="pole">{{ t('pole') }}</option>
-          <option value="wing">{{ t('wing') }}</option>
-        </select>
-        <select v-if="gridType === 'pole'" v-model="gridLength" style="padding:4px 10px; border-radius:4px;">
-          <option value="">{{ t('allLengths') }}</option>
-          <option v-for="len in gridAvailableLengths" :key="len" :value="len">
-            {{ len }} m
-          </option>
-        </select>
-      </div>
-      <div class="arena-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px;">
-        <div
-          v-for="item in paginatedGridItems"
-          :key="item.type + '-' + item.id"
-          style="position:relative; border: 1px solid #e1e1e1; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0 2px 8px #eee; background: #fafbfc;"
-        >
-          <input
-            type="checkbox"
-            :id="`grid-check-${item.type}-${item.id}`"
-            :value="item.type + '-' + item.id"
-            v-model="gridSelected"
-            style="position: absolute; top: 8px; left: 8px; width: 18px; height: 18px;"
-          />
-          <img
-            v-if="item.picture"
-            :src="fullImageUrl(item.picture)"
-            alt=""
-            style="height: 70px; margin-bottom: 8px; object-fit: contain;"
-          />
-          <div style="font-weight: bold; margin-bottom: 2px;">
-            {{ lang === 'hu' ? item.name_hu : item.name_en }}
-          </div>
-          <div style="color:#555;">
-            {{ item.color }}
-            <span v-if="item.length">, {{ item.length }} m</span>
-          </div>
-          <div style="font-size:13px; color:#888; margin-bottom:4px;">
-            {{ t(item.type) }}
-          </div>
-          <div>{{ t('stock') }}: {{ item.number }}</div>
-          <div v-if="gridSelected.includes(item.type + '-' + item.id)" style="margin-top:7px;">
-            <input
-              type="number"
-              :max="item.number"
-              min="1"
-              v-model.number="gridQuantities[item.type + '-' + item.id]"
-              :placeholder="`Max: ${item.number}`"
-              style="width:70px;"
-            />
-          </div>
-        </div>
-      </div>
-      <div v-if="gridPageCount > 1" style="display:flex; gap:8px; justify-content:center; margin:24px 0 0 0;">
-        <button
-          v-for="page in gridPageCount"
-          :key="page"
-          @click="gridCurrentPage = page"
-          :style="{
-            padding:'3px 13px', borderRadius:'7px',
-            background: gridCurrentPage === page ? '#2563eb' : '#ececec',
-            color: gridCurrentPage === page ? '#fff' : '#444',
-            border:'none', cursor:'pointer', fontWeight: gridCurrentPage === page ? 'bold' : 'normal'
-          }"
-        >
-          {{ page }}
-        </button>
-      </div>
-      <div v-if="paginatedGridItems.length === 0" style="color:gray; text-align:center; margin-top:1em;">
-        {{ t('noResults') }}
-      </div>
-      <div style="text-align:right; margin:24px 0;">
+      <h3>{{ t('availableGrid') }}</h3>
+     <div class="inline-form row">
+  <input
+    v-model="gridSearch"
+    type="text"
+    :placeholder="t('searchByName')"
+  />
+  <select v-model="gridColor">
+    <option value="">{{ t('allColors') }}</option>
+    <option v-for="color in gridAvailableColors" :key="color" :value="color">{{ color }}</option>
+  </select>
+  <select v-model="gridType">
+    <option value="">{{ t('both') }}</option>
+    <option value="pole">{{ t('pole') }}</option>
+    <option value="wing">{{ t('wing') }}</option>
+  </select>
+  <select v-if="gridType === 'pole'" v-model="gridLength">
+    <option value="">{{ t('allLengths') }}</option>
+    <option v-for="len in gridAvailableLengths" :key="len" :value="len">{{ len }} m</option>
+  </select>
+</div>
+
+<div class="arena-grid compact">
+  <div
+    v-for="item in paginatedGridItems"
+    :key="item.type + '-' + item.id"
+    class="table-row-card small-card"
+    :class="{ selected: gridSelected.includes(item.type + '-' + item.id) }"
+    @click="toggleGridItem(item)"
+  >
+    <input
+      type="checkbox"
+      :checked="gridSelected.includes(item.type + '-' + item.id)"
+      class="grid-checkbox"
+      style="position:absolute; top:8px; left:8px;"
+      readonly
+    />
+    <img
+      v-if="item.picture"
+      :src="fullImageUrl(item.picture)"
+      alt=""
+      class="table-image small-image clickable-image"
+      @click.stop="fullscreenImage = fullImageUrl(item.picture)"
+    />
+    <div style="margin-top:4px; font-weight:bold;">
+      {{ lang === 'hu' ? item.name_hu : item.name_en }}
+    </div>
+    <div style="margin-top:2px;">
+      {{ item.color }}<span v-if="item.length">, {{ item.length }} m</span>
+    </div>
+    <div style="font-size:13px; color:#aaa; margin-top:2px;">
+      {{ t(item.type) }}
+    </div>
+    <div style="margin-top:3px;">
+      {{ t('stock') }}: {{ item.number }}
+    </div>
+    <div
+      v-if="gridSelected.includes(item.type + '-' + item.id)"
+      style="margin-top:5px;"
+    >
+      <input
+        type="number"
+        :max="item.number"
+        min="1"
+        v-model.number="gridQuantities[item.type + '-' + item.id]"
+        :placeholder="`Max: ${item.number}`"
+        style="width:60px;"
+        @click.stop
+        @mousedown.stop
+      />
+    </div>
+  </div>
+</div>
+
+<div class="dot-pagination">
+  <span
+    v-for="page in gridPageCount"
+    :key="page"
+    class="dot"
+    :class="{ active: gridCurrentPage === page }"
+    @click="gridCurrentPage = page"
+  ></span>
+</div>
+      <div style="text-align:center; margin: 2rem 0;">
         <button type="submit" :disabled="gridSelected.length === 0">
           {{ t('assignSelected') }}
         </button>
       </div>
     </form>
-    <!-- Ha nem admin vagy crew, infó -->
-    <div v-else style="margin:3rem 0 0 0; color:#888; text-align:center;">
+
+    <div v-else class="muted" style="margin:3rem 0; text-align:center;">
       {{ t('noEditPermission') }}
+    </div>
+
+    <!-- Modal a nagy képhez -->
+    <div v-if="fullscreenImage" class="image-modal" @click.self="fullscreenImage = null">
+      <img :src="fullscreenImage" alt="Full image" />
+      <button class="modal-close-btn" @click="fullscreenImage = null">Close</button>
+    </div>
+
+    <div v-if="popupMessage" class="popup-modal">
+      {{ popupMessage }}
     </div>
   </div>
 </template>
-
 <script>
 import {
   fetchPoles,
@@ -206,6 +231,8 @@ export default {
       gridPerPage: 8,
       gridSelected: [],
       gridQuantities: {},
+       fullscreenImage: null,
+       popupMessage: "",
     }
   },
   computed: {
@@ -264,20 +291,6 @@ export default {
     this.loadPoles();
     this.loadWings();
     this.loadAssigned();
-
-    // Store getterből
-    console.log("USER getter a store-ban:", this.$store.getters.user);
-
-    // usePermissions összes property-je
-    console.log('usePermissions:', {
-      role: this.role?.value,
-      isAdmin: this.isAdmin?.value,
-      isCrew: this.isCrew?.value,
-      isChief: this.isChief?.value,
-      isWorker: this.isWorker?.value,
-      canEditArenas: this.canEditArenas?.value,
-      isLoggedIn: this.isLoggedIn?.value
-    });
   },
   methods: {
     fullImageUrl(path) {
@@ -285,6 +298,14 @@ export default {
       if (path.startsWith('http')) return path;
       return "http://localhost:8000" + path;
     },
+    toggleGridItem(item) {
+    const id = item.type + '-' + item.id;
+    if (this.gridSelected.includes(id)) {
+      this.gridSelected = this.gridSelected.filter(e => e !== id);
+    } else {
+      this.gridSelected.push(id);
+    }
+  },
     loadPoles() {
       fetchPoles().then(res => { this.poles = res.data; });
     },
@@ -339,12 +360,19 @@ export default {
         this.successMessage = '';
       });
     },
+  showPopup(message) {
+    this.popupMessage = message;
+    setTimeout(() => {
+      this.popupMessage = "";
+    }, 1000);
+  },
     deletePoleLoc(poleLoc) {
       deletePoleLocation(poleLoc.id)
         .then(() => {
           this.loadAssigned();
           this.loadPoles();
         });
+       this.showPopup(this.t('poleDeleted'));
     },
     deleteWingsLoc(wingLoc) {
       deleteWingsLocation(wingLoc.id)
@@ -352,6 +380,8 @@ export default {
           this.loadAssigned();
           this.loadWings();
         });
+
+      this.showPopup(this.t('wingDeleted'));
     },
     assignGridSelected() {
       const polesToAssign = [];
@@ -380,7 +410,7 @@ export default {
         )
       ])
       .then(() => {
-        this.successMessage = this.t('assignedSuccess');
+         this.showPopup(this.t('assignedSuccess'));
         this.errorMessage = '';
         this.gridSelected = [];
         this.gridQuantities = {};
@@ -389,7 +419,7 @@ export default {
         this.loadWings();
       })
       .catch(error => {
-        this.errorMessage = "Error: " + (error.response?.data?.detail || error.message);
+         this.showPopup("❌ " + (error.response?.data?.detail || error.message));
         this.successMessage = '';
       });
     }

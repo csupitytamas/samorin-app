@@ -35,6 +35,7 @@ export default {
       magnification: 70,
       items: [
         { icon: '🏠', label: 'events', to: '/events/list', show: () => this.canSeeEvents },
+        { icon: '✏️', label: 'eventCreate', to: '/events/create', show: () => this.isAdmin},
         { icon: '📦', label: 'archivedEvents', to: '/archived-events', show: () => this.canSeeArchivedEvents },
         { icon: '💫', label: 'wishlistCreate', to: '/wishlist', show: () => this.canCreateWishlist },
         { icon: '👤', label: 'profile', to: '/profile', show: () => this.isLoggedIn },

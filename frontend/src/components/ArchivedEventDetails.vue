@@ -1,37 +1,70 @@
 <template>
-  <div v-if="event">
-    <h2>{{ t('archivedEventDetails') }}</h2>
-    <p><b>{{ t('name') }}:</b> {{ event.event_name }}</p>
-    <p><b>{{ t('start') }}:</b> {{ event.event_start }}</p>
-    <p><b>{{ t('end') }}:</b> {{ event.event_end }}</p>
-    <p><b>{{ t('closedAt') }}:</b> {{ event.closed_at }}</p>
+  <div class="container">
+    <div v-if="event">
+      <h2>{{ t('archivedEventDetails') }}</h2>
+      <div class="box-border" style="text-align:center;">
+        <p><b>{{ t('name') }}:</b> {{ event.event_name }}</p>
+        <p><b>{{ t('start') }}:</b> {{ event.event_start }}</p>
+        <p><b>{{ t('end') }}:</b> {{ event.event_end }}</p>
+      </div>
 
-    <h3>{{ t('arenas') }}</h3>
-    <div v-for="arena in event.arenas" :key="arena.id" style="margin-bottom:2rem;">
-      <b>{{ arena.name }}</b>
-      <div>
-        <span>{{ t('poles') }}:</span>
-        <ul>
-          <li v-for="pole in arena.poles" :key="pole.id">
-            {{ pole.pole_name }} - {{ pole.color }} - {{ pole.length }}m ({{ pole.quantity }})
-          </li>
-          <li v-if="arena.poles.length === 0" style="color:gray;">{{ t('noPoles') }}</li>
-        </ul>
-      </div>
-      <div>
-        <span>{{ t('wings') }}:</span>
-        <ul>
-          <li v-for="wing in arena.wings" :key="wing.id">
-            {{ wing.wing_name }} - {{ wing.color }} ({{ wing.quantity }})
-          </li>
-          <li v-if="arena.wings.length === 0" style="color:gray;">{{ t('noWings') }}</li>
-        </ul>
-      </div>
+      <h3>{{ t('arenas') }}</h3>
+      <div v-for="arena in event.arenas" :key="arena.id" class="box-border">
+        <h4 style="text-align:center;">{{ arena.name }}</h4>
+
+        <!-- Poles table -->
+      <div v-if="arena.poles.length">
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>{{ t('name') }}</th>
+        <th>{{ t('color') }}</th>
+        <th>{{ t('length') }}</th>
+        <th>{{ t('quantity') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="pole in arena.poles" :key="pole.id">
+        <td>{{ pole.pole_name }}</td>
+        <td>{{ pole.color }}</td>
+        <td>{{ pole.length }}</td>
+        <td>{{ pole.quantity }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div v-else class="muted" style="text-align:center;">
+  {{ t('noArchivedPoles') }}
+</div>
+
+<div v-if="arena.wings.length" style="margin-top:1rem;">
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>{{ t('name') }}</th>
+        <th>{{ t('color') }}</th>
+        <th>{{ t('quantity') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="wing in arena.wings" :key="wing.id">
+        <td>{{ wing.wing_name }}</td>
+        <td>{{ wing.color }}</td>
+        <td>{{ wing.quantity }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div v-else class="muted" style="text-align:center;">
+  {{ t('noArchivedWings') }}
+</div>
+        </div>
+    </div>
+    <div v-else style="text-align:center;">
+      {{ t('loading') }}
     </div>
   </div>
-  <div v-else>
-    {{ t('loading') }}
-  </div>
+
 </template>
 
 <script>

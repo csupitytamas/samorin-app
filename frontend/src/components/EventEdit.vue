@@ -21,7 +21,7 @@
     <div v-if="successMessage" class="success-msg">{{ successMessage }}</div>
     <div v-if="errorMessage" class="error-msg">{{ errorMessage }}</div>
 
-    <h3>{{ t('arenas') }}</h3>
+    <h3>{{ t('arenasRename') }}</h3>
     <ul>
      <li v-for="arena in arenas" :key="arena.id" class="table-row-card inline-form">
         <template v-if="editingArenaId === arena.id">

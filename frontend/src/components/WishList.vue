@@ -1,124 +1,119 @@
 <template>
-  <div>
+  <div class="container">
     <h2>{{ t('submitWishlist') }}</h2>
-    <div>
-      <label>{{ t('arena') }}:</label>
-      <select v-model="selectedArena" required>
-        <option v-for="arena in arenas" :key="arena.id" :value="arena.id">
-          {{ arena.name }}
-        </option>
+
+  <div class="inline-form row">
+ <select v-model="selectedArena">
+  <option disabled value="default">{{ t('selectArena') }}</option>
+  <option v-for="arena in arenas" :key="arena.id" :value="arena.id">
+    {{ arena.name }}
+  </option>
+</select>
+</div>
+
+    <div class="inline-form row">
+      <input v-model="gridSearch" type="text" :placeholder="t('searchByName')" />
+      <select v-model="gridColor">
+        <option value="">{{ t('allColors') }}</option>
+        <option v-for="color in gridAvailableColors" :key="color" :value="color">{{ color }}</option>
+      </select>
+      <select v-model="gridType">
+        <option value="">{{ t('both') }}</option>
+        <option value="pole">{{ t('pole') }}</option>
+        <option value="wing">{{ t('wing') }}</option>
+      </select>
+      <select v-if="gridType === 'pole'" v-model="gridLength">
+        <option value="">{{ t('allLengths') }}</option>
+        <option v-for="len in gridAvailableLengths" :key="len" :value="len">{{ len }} m</option>
       </select>
     </div>
-    <form @submit.prevent="submitWishlist" style="margin-top: 2rem;">
-      <div style="margin-bottom: 16px; display: flex; gap: 12px;">
+
+    <div class="arena-grid compact">
+      <div
+        v-for="item in paginatedGridItems"
+        :key="item.type + '-' + item.id"
+        class="table-row-card small-card"
+        :class="{ selected: gridSelected.includes(item.type + '-' + item.id) }"
+        @click="toggleGridItem(item)"
+      >
         <input
-          v-model="gridSearch"
-          type="text"
-          :placeholder="t('searchByName')"
-          style="padding:4px 10px; border-radius:4px; border:1px solid #bbb;"
+          type="checkbox"
+          :checked="gridSelected.includes(item.type + '-' + item.id)"
+          class="grid-checkbox"
+          style="position:absolute; top:8px; left:8px;"
+          readonly
         />
-        <select v-model="gridColor" style="padding:4px 10px; border-radius:4px;">
-          <option value="">{{ t('allColors') }}</option>
-          <option v-for="color in gridAvailableColors" :key="color" :value="color">{{ color }}</option>
-        </select>
-        <select v-model="gridType" style="padding:4px 10px; border-radius:4px;">
-          <option value="">{{ t('both') }}</option>
-          <option value="pole">{{ t('pole') }}</option>
-          <option value="wing">{{ t('wing') }}</option>
-        </select>
-        <!-- Length filter csak Pole esetén -->
-        <select v-if="gridType === 'pole'" v-model="gridLength" style="padding:4px 10px; border-radius:4px;">
-          <option value="">{{ t('allLengths') }}</option>
-          <option v-for="len in gridAvailableLengths" :key="len" :value="len">
-            {{ len }} m
-          </option>
-        </select>
-      </div>
-      <div class="arena-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 18px;">
-        <div
-          v-for="item in paginatedGridItems"
-          :key="item.type + '-' + item.id"
-          style="position:relative; border: 1px solid #e1e1e1; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0 2px 8px #eee; background: #fafbfc;"
-        >
-          <!-- Checkbox a sarokban -->
+        <img
+          v-if="item.picture"
+          :src="fullImageUrl(item.picture)"
+          alt=""
+          class="table-image small-image clickable-image"
+          @click.stop="fullscreenImage = fullImageUrl(item.picture)"
+        />
+        <div style="margin-top:4px; font-weight:bold;">
+          {{ lang === 'hu' ? item.name_hu : item.name_en }}
+        </div>
+        <div style="margin-top:2px;">
+          {{ item.color }}<span v-if="item.length">, {{ item.length }} m</span>
+        </div>
+        <div style="font-size:13px; color:#aaa; margin-top:2px;">
+          {{ t(item.type) }}
+        </div>
+        <div style="margin-top:3px;">
+          {{ t('stock') }}: {{ item.number }}
+        </div>
+        <div v-if="gridSelected.includes(item.type + '-' + item.id)" style="margin-top:5px;">
           <input
-            type="checkbox"
-            :id="`grid-check-${item.type}-${item.id}`"
-            :value="item.type + '-' + item.id"
-            v-model="gridSelected"
-            style="position: absolute; top: 8px; left: 8px; width: 18px; height: 18px;"
+            type="number"
+            :max="item.number"
+            min="1"
+            v-model.number="gridQuantities[item.type + '-' + item.id]"
+            :placeholder="`Max: ${item.number}`"
+            style="width:60px;"
+            @click.stop
+            @mousedown.stop
           />
-          <img
-            v-if="item.picture"
-            :src="fullImageUrl(item.picture)"
-            alt=""
-            style="height: 70px; margin-bottom: 8px; object-fit: contain;"
-          />
-          <div style="font-weight: bold; margin-bottom: 2px;">
-            {{ lang === 'hu' ? item.name_hu : item.name_en }}
-          </div>
-          <div style="color:#555;">
-            {{ item.color }}
-            <span v-if="item.length">, {{ item.length }} m</span>
-          </div>
-          <div style="font-size:13px; color:#888; margin-bottom:4px;">
-            {{ t(item.type) }}
-          </div>
-          <div>{{ t('stock') }}: {{ item.number }}</div>
-          <!-- Quantity input, ha kijelölve -->
-          <div v-if="gridSelected.includes(item.type + '-' + item.id)" style="margin-top:7px;">
-            <input
-              type="number"
-              :max="item.number"
-              min="1"
-              v-model.number="gridQuantities[item.type + '-' + item.id]"
-              :placeholder="`Max: ${item.number}`"
-              style="width:70px;"
-            />
-          </div>
         </div>
       </div>
-      <!-- Pagination -->
-      <div v-if="gridPageCount > 1" style="display:flex; gap:8px; justify-content:center; margin:24px 0 0 0;">
-        <button
-          v-for="page in gridPageCount"
-          :key="page"
-          @click="gridCurrentPage = page"
-          :style="{
-            padding:'3px 13px', borderRadius:'7px',
-            background: gridCurrentPage === page ? '#2563eb' : '#ececec',
-            color: gridCurrentPage === page ? '#fff' : '#444',
-            border:'none', cursor:'pointer', fontWeight: gridCurrentPage === page ? 'bold' : 'normal'
-          }"
-        >
-          {{ page }}
-        </button>
-      </div>
-      <div v-if="paginatedGridItems.length === 0" style="color:gray; text-align:center; margin-top:1em;">
-        {{ t('noResults') }}
-      </div>
+    </div>
 
-      <!-- Megjegyzés -->
-      <div style="margin:24px 0;">
-        <label for="wishlist-note">{{ t('note') }}</label>
-        <textarea
-          id="wishlist-note"
-          v-model="note"
-          rows="2"
-          cols="40"
-          :placeholder="t('writeNote') || 'Írj megjegyzést...'"
-        ></textarea>
-      </div>
-      <div style="text-align:right; margin:24px 0;">
-        <button type="submit" :disabled="gridSelected.length === 0">
-          {{ t('submitWishlist') || 'Submit Wishlist' }}
-        </button>
-      </div>
-    </form>
-    <div v-if="successMessage" style="color:green;">{{ successMessage }}</div>
-    <div v-if="errorMessage" style="color:red;">{{ errorMessage }}</div>
+    <div class="dot-pagination" v-if="gridPageCount > 1">
+      <span
+        v-for="page in gridPageCount"
+        :key="page"
+        class="dot"
+        :class="{ active: gridCurrentPage === page }"
+        @click="gridCurrentPage = page"
+      ></span>
+    </div>
+
+    <div style="margin-top:1.5rem;">
+      <label>{{ t('note') }}</label>
+      <textarea
+        v-model="note"
+        rows="2"
+        cols="40"
+        :placeholder="t('writeNote')"
+        style="width:100%; margin-top:0.5rem;"
+      ></textarea>
+    </div>
+
+    <div style="text-align:right; margin-top:1.5rem;">
+      <button type="button" @click="submitWishlist" :disabled="gridSelected.length === 0">
+        {{ t('assignSelected') }}
+      </button>
+    </div>
+
+    <div v-if="successMessage" style="color:green; margin-top:1rem;">{{ successMessage }}</div>
+    <div v-if="errorMessage" style="color:red; margin-top:1rem;">{{ errorMessage }}</div>
+
+    <div v-if="fullscreenImage" class="image-modal" @click.self="fullscreenImage = null">
+      <img :src="fullscreenImage" alt="Full image" />
+      <button class="modal-close-btn" @click="fullscreenImage = null">Close</button>
+    </div>
   </div>
 </template>
+
 
 <script>
 import { fetchActiveArenas, fetchPoles, fetchWings, wishList } from '@/api/api'
@@ -132,7 +127,7 @@ export default {
       arenas: [],
       poles: [],
       wings: [],
-      selectedArena: null,
+         selectedArena: "default",
       note: "",
       successMessage: '',
       errorMessage: '',
@@ -144,6 +139,7 @@ export default {
       gridPerPage: 8,
       gridSelected: [],
       gridQuantities: {},
+
     }
   },
   computed: {
@@ -203,12 +199,21 @@ export default {
       if (path.startsWith('http')) return path;
       return "http://localhost:8000" + path;
     },
+    toggleGridItem(item) {
+      const key = item.type + '-' + item.id;
+      if (this.gridSelected.includes(key)) {
+        this.gridSelected = this.gridSelected.filter(k => k !== key);
+        delete this.gridQuantities[key];
+      } else {
+        this.gridSelected.push(key);
+        this.gridQuantities[key] = 1;
+      }
+    },
     submitWishlist() {
       if (!this.selectedArena) {
         this.errorMessage = this.t('selectArena') || "Please select an arena!";
         return;
       }
-      // Pole és Wing itemek összegyűjtése checkbox szerint
       const pole_items = [];
       const wing_items = [];
       for (const key of this.gridSelected) {
@@ -242,6 +247,7 @@ export default {
         this.errorMessage = this.t('errorOccurred') + ": " + (err.response?.data?.detail || err.message);
       });
     }
-  }
 }
+}
+
 </script>
