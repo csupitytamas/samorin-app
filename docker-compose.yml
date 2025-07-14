@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+   jumpdepo-db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: samorin
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+   jumpdepo-backend:
+    build: .
+    command: ["/wait-for-it.sh", "jumpdepo-db:5432", "--", "gunicorn", "DjangoProject.wsgi:application", "--bind", "0.0.0.0:8000"]
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - jumpdepo-db
+
+   jumpdepo-frontend:
+     build:
+       context: ./frontend
+     ports:
+       - "8080:80"
+     depends_on:
+       - jumpdepo-backend
+
+volumes:
+  pgdata:
