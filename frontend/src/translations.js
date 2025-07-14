@@ -115,7 +115,7 @@ export default {
     noArchivedWings: "Nincsenek archivált kitörők",
     login: "Bejelentkezés",
     password: "Jelszó",
-    keepLoggedIn: "Maradjak bejelentkezve",
+    keepLoggedIn: "  Maradjak bejelentkezve",
     noAccount: "Nincs még fiókod?",
     registerHere: "Regisztrálj itt!",
     invalidLogin: "Hibás bejelentkezési adatok!",
@@ -129,6 +129,7 @@ export default {
     emailTaken: "Ez az email már foglalt!",
     alreadyAccount: "Már van fiókod?",
     loginHere: "Jelentkezz be itt!",
+    selectedItems: "Kiválasztott tételek",
 
 
 
@@ -246,7 +247,7 @@ export default {
     noArchivedWings: "No archived wings",
     login: "Login",
     password: "Password",
-    keepLoggedIn: "Keep me logged in",
+    keepLoggedIn: "  Keep me logged in",
     noAccount: "Don't have an account?",
     registerHere: "Register here!",
     invalidLogin: "Invalid login credentials!",
@@ -260,6 +261,7 @@ export default {
     emailTaken: "This email is already taken!",
     alreadyAccount: "Already have an account?",
     loginHere: "Login here!",
+    selectedItems: "Selected items",
 
   }
 }

@@ -1,23 +1,22 @@
 <template>
   <div class="dock-outer">
     <div class="dock-panel">
-      <div
-        v-for="(item, index) in computedItems"
-        :key="index"
-        class="dock-item"
-        @mouseenter="hoveredIndex = index"
-        @mouseleave="hoveredIndex = null"
-        @click="goTo(item.to)"
-        :style="{
-          width: itemWidth(index) + 'px',
-          height: itemWidth(index) + 'px'
-        }"
-      >
-        <div class="dock-icon">{{ item.icon }}</div>
-        <div v-if="hoveredIndex === index" class="dock-label">
-          {{ t(item.label) }}
-        </div>
-      </div>
+          <div
+      v-for="(item, index) in computedItems"
+      :key="index"
+      class="dock-item"
+      @mouseenter="hoveredIndex = index"
+      @mouseleave="hoveredIndex = null"
+      @click="goTo(item.to)"
+      :style="{
+        width: itemWidth(index) + 'px',
+        height: itemWidth(index) + 'px'
+      }"
+    ><div class="dock-icon">
+  <img v-if="item.iconType === 'img'" :src="item.iconSrc" alt="icon" class="icon-svg" />
+  <span v-else v-html="item.icon"></span>
+</div>
+    </div>
     </div>
   </div>
 </template>
@@ -25,6 +24,12 @@
 <script>
 import translations from '@/translations'
 import { mapState } from 'vuex'
+import archiveIcon from '@/assets/archive.svg'
+import editIcon from '@/assets/edit.svg'
+import listIcon from '@/assets/list.svg'
+import profileIcon from '@/assets/user.svg'
+import adminIcon from '@/assets/info.svg'
+import createIcon from '@/assets/plus.svg'
 
 export default {
   name: 'NavBar',
@@ -33,14 +38,14 @@ export default {
       hoveredIndex: null,
       baseItemSize: 50,
       magnification: 70,
-      items: [
-        { icon: '🏠', label: 'events', to: '/events/list', show: () => this.canSeeEvents },
-        { icon: '✏️', label: 'eventCreate', to: '/events/create', show: () => this.isAdmin},
-        { icon: '📦', label: 'archivedEvents', to: '/archived-events', show: () => this.canSeeArchivedEvents },
-        { icon: '💫', label: 'wishlistCreate', to: '/wishlist', show: () => this.canCreateWishlist },
-        { icon: '👤', label: 'profile', to: '/profile', show: () => this.isLoggedIn },
-        { icon: '⚙️', label: 'adminDashboard', to: '/admin', show: () => this.isAdmin },
-      ]
+     items: [
+      { iconType: 'img', iconSrc: listIcon, label: 'events', to: '/events/list', show: () => this.canSeeEvents },
+      { iconType: 'img', iconSrc: createIcon, label: 'eventCreate', to: '/events/create', show: () => this.isAdmin },
+      { iconType: 'img', iconSrc: archiveIcon, label: 'archivedEvents', to: '/archived-events', show: () => this.canSeeArchivedEvents },
+      { iconType: 'img', iconSrc: editIcon, label: 'wishlistCreate', to: '/wishlist', show: () => this.canCreateWishlist },
+      { iconType: 'img', iconSrc: profileIcon, label: 'profile', to: '/profile', show: () => this.isLoggedIn },
+      { iconType: 'img', iconSrc: adminIcon, label: 'adminDashboard', to: '/admin', show: () => this.isAdmin }
+    ]
     }
   },
   computed: {

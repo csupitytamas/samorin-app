@@ -86,20 +86,27 @@
       </div>
 
       <div class="dot-pagination" v-if="gridPageCount > 1">
-        <span v-for="page in gridPageCount" :key="page" class="dot"
-          :class="{ active: gridCurrentPage === page }"
-          @click="gridCurrentPage = page"></span>
+    <span
+      v-for="page in gridPageCount"
+      :key="page"
+      class="dot"
+      :class="{ active: gridCurrentPage === page }"
+      @click="gridCurrentPage = page"
+      title="Page {{ page }}"
+    ></span>
       </div>
 
+
       <div v-if="paginatedGridItems.length === 0" class="muted centered">{{ t('noResults') }}</div>
-      <div style="text-align:right; margin-top:var(--padding-m);">
+      <div style="text-align:center; margin-top:var(--padding-m);">
         <button @click="addSelectedToWishlist" :disabled="gridSelected.length === 0">
           {{ t('assignSelected') }}
         </button>
       </div>
     </div>
 
-    <div style="margin-top:var(--padding-l); text-align:right;">
+
+    <div style="margin-top:var(--padding-l); text-align:center;">
       <button @click="saveEdit" :disabled="wishlistItems.length === 0">{{ t('save') }}</button>
       <button @click="$router.back()" style="margin-left:1rem;">{{ t('cancel') }}</button>
     </div>

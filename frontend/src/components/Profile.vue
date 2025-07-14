@@ -17,39 +17,59 @@
     </div>
 
     <div v-if="wishlists.length" class="box-border">
-      <h3>{{ t('myWishlists') }}</h3>
-      <div v-for="wishlist in wishlists" :key="wishlist.id" class="wishlist-card">
+  <h3>{{ t('myWishlists') }}</h3>
+
+      <div v-for="wishlist in wishlists"
+           :key="wishlist.id"
+           class="wishlist-card white-bg">
+
         <div class="wishlist-header">
-          <strong>{{ wishlist.arena_name }}</strong>
-          <button class="arena-button" style="background: var(--accent-color); color: var(--bg-color);"
+          <div class="wishlist-user">
+            <b>{{ t('arena') }}:</b>
+            <span class="strong">{{ wishlist.arena_name }}</span>
+          </div>
+          <button class="arena-button"
+                  style="background: var(--accent-color); color: var(--bg-color);"
                   @click="editWishlist(wishlist.id)">
-        {{ t('edit') }}
-      </button>
+            {{ t('edit') }}
+          </button>
+
+        </div>
+        <div class="wishlist-date" v-if="wishlist.created_at">
+            <b>{{ t('created') }}:</b>
+            <span class="strong">{{ formatDateTime(wishlist.created_at) }}</span>
         </div>
         <div v-if="wishlist.note" class="wishlist-note">
           <i>{{ t('note') }}:</i> {{ wishlist.note }}
         </div>
-        <div class="wishlist-items">
-          <div v-if="wishlist.pole_items && wishlist.pole_items.length">
-            <b>{{ t('poleItems') }}:</b>
-            <ul>
-              <li v-for="pole in wishlist.pole_items" :key="pole.id" class="wishlist-line">
-                {{ lang === 'hu' ? pole.pole_name_hu : pole.pole_name_en }}
-                ({{ pole.pole_color }}, {{ pole.pole_length }}m) – {{ pole.quantity }} db
-              </li>
-            </ul>
-          </div>
-          <div v-if="wishlist.wing_items && wishlist.wing_items.length" style="margin-top:0.5rem;">
-            <b>{{ t('wingItems') }}:</b>
-            <ul>
-              <li v-for="wing in wishlist.wing_items" :key="wing.id" class="wishlist-line">
-                {{ lang === 'hu' ? wing.wing_name_hu : wing.wing_name_en }}
-                ({{ wing.wing_color }}) – {{ wing.quantity }} db
-              </li>
-            </ul>
+
+    <div class="wishlist-items">
+      <div>
+        <b>{{ t('poleItems') }}:</b>
+        <div v-if="!wishlist.pole_items?.length" class="muted">—</div>
+        <div v-else>
+          <div v-for="pole in wishlist.pole_items"
+               :key="pole.id"
+               class="wishlist-line">
+            {{ lang === 'hu' ? pole.pole_name_hu : pole.pole_name_en }}
+            ({{ pole.pole_color }}, {{ pole.pole_length }}m) – x{{pole.quantity }}
           </div>
         </div>
       </div>
+      <div style="margin-top:0.5rem;">
+        <b>{{ t('wingItems') }}:</b>
+        <div v-if="!wishlist.wing_items?.length" class="muted">—</div>
+        <div v-else>
+          <div v-for="wing in wishlist.wing_items"
+               :key="wing.id"
+               class="wishlist-line">
+            {{ lang === 'hu' ? wing.wing_name_hu : wing.wing_name_en }}
+            ({{ wing.wing_color }}) –  x{{wing.quantity }}
+          </div>
+          </div>
+       </div>
+      </div>
+     </div>
     </div>
   </div>
 </template>
@@ -89,6 +109,10 @@ export default {
     editWishlist(id) {
       this.$router.push({ name: "wishlist-edit", params: { id } })
     },
+    formatDateTime(datetime) {
+      if (!datetime) return ''
+      return new Date(datetime).toLocaleString()
+    }
   }
 }
 </script>

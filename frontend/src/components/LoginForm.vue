@@ -9,7 +9,7 @@
         <div style="margin-bottom: 1rem;">
           <input v-model="password" type="password" :placeholder="t('password')" required />
         </div>
-    <div class="form-group" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin: 1rem 0;">
+    <div class="form-group" style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin: 1rem 0;">
   <div class="checkbox-wrapper-29">
     <label class="checkbox">
       <input type="checkbox" class="checkbox__input" v-model="rememberMe" />

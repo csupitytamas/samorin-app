@@ -109,6 +109,7 @@
   </select>
 </div>
 
+
 <div class="arena-grid compact">
   <div
     v-for="item in paginatedGridItems"
@@ -179,6 +180,13 @@
 
     <div v-else class="muted" style="margin:3rem 0; text-align:center;">
       {{ t('noEditPermission') }}
+    </div>
+
+    <div style="text-align:center; margin-bottom:1.5rem;">
+      <button type="button"
+          @click="$router.push({ name: 'event-list' })">
+    {{ t('save') || 'Save' }}
+      </button>
     </div>
 
     <!-- Modal a nagy képhez -->
@@ -317,48 +325,6 @@ export default {
         .then(res => { this.assignedPoles = res.data; });
       fetchWingLocationsByArena(this.arenaId)
         .then(res => { this.assignedWings = res.data; });
-    },
-    submitPoles() {
-      Promise.all(this.selectedPoles.map(poleId => {
-        return createPoleLocation({
-          pole_id: poleId,
-          quantity: this.poleQuantities[poleId] || 1,
-          arena: this.arenaId
-        });
-      }))
-      .then(() => {
-        this.successMessage = this.t('polesAssigned');
-        this.errorMessage = "";
-        this.selectedPoles = [];
-        this.poleQuantities = {};
-        this.loadAssigned();
-        this.loadPoles();
-      })
-      .catch(error => {
-        this.errorMessage = "Error: " + (error.response?.data?.detail || error.message);
-        this.successMessage = '';
-      });
-    },
-    submitWings() {
-      Promise.all(this.selectedWings.map(wingId => {
-        return createWingLocation({
-          wing_id: wingId,
-          quantity: this.wingQuantities[wingId] || 1,
-          arena: this.arenaId
-        });
-      }))
-      .then(() => {
-        this.successMessage = this.t('wingsAssigned');
-        this.errorMessage = "";
-        this.selectedWings = [];
-        this.wingQuantities = {};
-        this.loadAssigned();
-        this.loadWings();
-      })
-      .catch(error => {
-        this.errorMessage = "Error: " + (error.response?.data?.detail || error.message);
-        this.successMessage = '';
-      });
     },
   showPopup(message) {
     this.popupMessage = message;

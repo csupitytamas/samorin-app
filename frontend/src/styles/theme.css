@@ -614,6 +614,19 @@ button:hover {
 .checkbox-wrapper-29 .checkbox__label:after:active {
   border-color: var(--accent-color);
 }
+.form-box select {
+  background: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--border-radius);
+  padding: var(--padding-s);
+  width: 100%;
+}
+.dock-icon img.icon-svg {
+  width: 24px;
+  height: 24px;
+  filter: invert(1); /* ha dark mode miatt kell */
+}
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
   10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
