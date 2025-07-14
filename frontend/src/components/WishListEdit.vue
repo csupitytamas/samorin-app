@@ -53,37 +53,51 @@
         </select>
       </div>
 
-      <div class="arena-grid compact">
-        <div v-for="item in paginatedGridItems" :key="item.type + '-' + item.id"
-          class="table-row-card small-card"
-          :class="{ selected: gridSelected.includes(item.type + '-' + item.id) }"
-          @click="toggleGridItem(item)">
-          <input type="checkbox"
+         <div class="arena-grid compact">
+      <div v-for="item in paginatedGridItems"
+           :key="item.type + '-' + item.id"
+           class="table-row-card small-card"
+           :class="{ selected: gridSelected.includes(item.type + '-' + item.id) }"
+           @click="toggleGridItem(item)">
+
+      <div class="checkbox-wrapper-29 wishlist-checkbox"
+           style="position:absolute; top:1rem; left:1rem; transform: scale(0.6); background:none;">
+        <label class="checkbox">
+          <input
+            type="checkbox"
+            class="checkbox__input"
             :checked="gridSelected.includes(item.type + '-' + item.id)"
-            class="grid-checkbox"
-            style="position:absolute; top:8px; left:8px;" readonly>
-          <img v-if="item.picture" :src="fullImageUrl(item.picture)" class="table-image small-image clickable-image"
-            @click.stop="fullscreenImage = fullImageUrl(item.picture)">
-          <div style="margin-top:4px; font-weight:bold;">
-            {{ lang === 'hu' ? item.name_hu : item.name_en }}
-          </div>
-          <div style="margin-top:2px;">
-            {{ item.color }}<span v-if="item.length">, {{ item.length }} m</span>
-          </div>
-          <div style="font-size:var(--font-size-s); color:var(--muted-color); margin-top:2px;">
-            {{ t(item.type) }}
-          </div>
-          <div style="margin-top:3px;">
-            {{ t('stock') }}: {{ item.number }}
-          </div>
-          <div v-if="gridSelected.includes(item.type + '-' + item.id)" style="margin-top:5px;">
-            <input type="number" :max="item.number" min="1"
-              v-model.number="gridQuantities[item.type + '-' + item.id]"
-              :placeholder="`Max: ${item.number}`"
-              style="width:60px; background:var(--bg-color); color:var(--text-color); border:1px solid rgba(255,255,255,0.15); border-radius:var(--border-radius); padding:var(--padding-s);">
-          </div>
+            @click.stop="toggleGridItem(item)"
+          />
+          <span class="checkbox__label"></span>
+        </label>
+      </div>
+
+        <img v-if="item.picture" :src="fullImageUrl(item.picture)"
+             class="table-image small-image clickable-image"
+             @click.stop="fullscreenImage = fullImageUrl(item.picture)">
+        <div style="margin-top:4px; font-weight:bold;">
+          {{ lang === 'hu' ? item.name_hu : item.name_en }}
+        </div>
+        <div style="margin-top:2px;">
+          {{ item.color }}<span v-if="item.length">, {{ item.length }} m</span>
+        </div>
+        <div style="font-size:var(--font-size-s); color:var(--muted-color); margin-top:2px;">
+          {{ t(item.type) }}
+        </div>
+        <div style="margin-top:3px;">
+          {{ t('stock') }}: {{ item.number }}
+        </div>
+        <div v-if="gridSelected.includes(item.type + '-' + item.id)" style="margin-top:5px;">
+          <input type="number" :max="item.number" min="1"
+                 v-model.number="gridQuantities[item.type + '-' + item.id]"
+                 :placeholder="`Max: ${item.number}`"
+                 style="width:60px; background:var(--bg-color); color:var(--text-color);
+                        border:1px solid rgba(255,255,255,0.15); border-radius:var(--border-radius);
+                        padding:var(--padding-s);">
         </div>
       </div>
+    </div>
 
       <div class="dot-pagination" v-if="gridPageCount > 1">
     <span

@@ -627,6 +627,31 @@ button:hover {
   height: 24px;
   filter: invert(1); /* ha dark mode miatt kell */
 }
+
+.wishlist-checkbox .checkbox__label {
+  border: none !important;
+  background: none !important;
+}
+
+.wishlist-checkbox .checkbox__input:checked + .checkbox__label {
+  border: none !important;
+  background: var(--accent-color); /* ha szeretnél pipát akkor lehet színezni */
+}
+.wishlist-checkbox .checkbox__label:before {
+  background: transparent !important;
+  border-radius: 50%;
+}
+
+.wishlist-checkbox .checkbox__input:checked ~ .checkbox__label:before {
+  background: var(--accent-color) !important;
+  border: none !important;
+  border-radius: 50%;
+}
+
+.wishlist-checkbox .checkbox__label:after {
+  display: none !important;
+}
+
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
   10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }

@@ -48,22 +48,26 @@
     </select>
   </div>
 </div>
-
-    <div class="arena-grid compact">
-      <div
-        v-for="item in paginatedGridItems"
-        :key="item.type + '-' + item.id"
-        class="table-row-card small-card"
-        :class="{ selected: gridSelected.includes(item.type + '-' + item.id) }"
-        @click="toggleGridItem(item)"
-      >
-        <input
-          type="checkbox"
-          :checked="gridSelected.includes(item.type + '-' + item.id)"
-          class="grid-checkbox"
-          style="position:absolute; top:8px; left:8px;"
-          readonly
-        />
+<div class="arena-grid compact">
+  <div
+    v-for="item in paginatedGridItems"
+    :key="item.type + '-' + item.id"
+    class="table-row-card small-card"
+    :class="{ selected: gridSelected.includes(item.type + '-' + item.id) }"
+    @click="toggleGridItem(item)"
+  >
+<div class="checkbox-wrapper-29 wishlist-checkbox"
+     style="position:absolute; top:1rem; left:1rem; transform: scale(0.6); background:none;">
+  <label class="checkbox">
+    <input
+      type="checkbox"
+      class="checkbox__input"
+      :checked="gridSelected.includes(item.type + '-' + item.id)"
+      @click.stop="toggleGridItem(item)"
+    />
+    <span class="checkbox__label"></span>
+  </label>
+</div>
         <img
           v-if="item.picture"
           :src="fullImageUrl(item.picture)"
