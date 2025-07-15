@@ -225,7 +225,7 @@ export default {
   methods: {
     fullImageUrl(path) {
       if (!path) return "";
-      return path.startsWith('http') ? path : "http://localhost:8000" + path;
+      return path.startsWith('http') ? path : "http://13.48.70.78:8000" + path;
     },
     toggleGridItem(item) {
       const key = item.type + '-' + item.id

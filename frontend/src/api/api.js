@@ -42,7 +42,7 @@ axios.interceptors.response.use(
   }
 )
 
-const API_BASE = 'http://localhost:8000/api/'
+const API_BASE = 'http://13.48.70.78:8000/api/';
 
 // --- API FÜGGVÉNYEK ---
 export function fetchEvents() {
