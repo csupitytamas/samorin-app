@@ -18,12 +18,12 @@ class ArenaSerializer(serializers.ModelSerializer):
 class PoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pole
-        fields = ['name_hu', 'name_en', 'color', 'length', 'picture']
+        fields = ['id', 'name_hu', 'name_en', 'color', 'length', 'picture']
 
 class WingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wings
-        fields = ['name_hu', 'name_en', 'color', 'picture']
+        fields = ['id', 'name_hu', 'name_en', 'color', 'picture']
 
 
 class PoleLocationSerializer(serializers.ModelSerializer):

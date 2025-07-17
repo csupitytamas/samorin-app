@@ -42,7 +42,9 @@ axios.interceptors.response.use(
   }
 )
 
-const API_BASE = 'http://13.48.70.78:8000/api/';
+const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'http://13.48.70.78:8000/api/'
+  : '/api/';
 
 // --- API FÜGGVÉNYEK ---
 export function fetchEvents() {
@@ -155,4 +157,7 @@ export function fetchEventWishlists(eventId) {
 }
 export function fetchActiveArenas() {
   return axios.get(API_BASE + 'active-arenas/')
+}
+export function deleteWishlist(id) {
+  return axios.delete(API_BASE + `wishlist/${id}/`);
 }

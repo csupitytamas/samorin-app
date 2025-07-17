@@ -4,7 +4,7 @@
   --bg-color: #191919;
   --surface-color: #1e1e1e;
   --accent-color: #00d1b2; /* ez lesz a fő highlight */
-  --text-color: #f5f5f5;
+  --text-color: #ffffff;
   --muted-color: #aaaaaa;
   /* Spacing */
   --padding-s: 0.5rem;
@@ -376,6 +376,7 @@ button:hover {
 }
 .inline-form.row {
   display: flex;
+  flex-direction: row; /* force horizontal layout */
   flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
@@ -652,6 +653,40 @@ button:hover {
   display: none !important;
 }
 
+.wishlist-table {
+  width: 100%;
+  min-width: 0 !important;
+  max-width: 98vw !important;
+  table-layout: fixed;
+}
+.wishlist-table th,
+.wishlist-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 65px;
+  padding: 4px 1px;
+  font-size: 13px;
+}
+
+.wishlist-table-wrapper {
+  margin-top: 15px;
+  padding: 10px;
+  border: 2px solid #00C19A;
+  border-radius: 14px;
+}
+
+.wishlist-table td img {
+  max-height: 3rem;
+  border-radius: 6px;
+  cursor: zoom-in;
+}
+@media (min-width: 600px) {
+  .wishlist-table td img {
+    max-height: 3.5rem;
+    max-width: 7rem;
+  }
+}
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
   10% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -662,6 +697,11 @@ button:hover {
 /* Tablet / desktop méretnél csökkentjük */
 @media (min-width: 600px) {
   .table-image {
+    width: auto;
+    max-width: 6rem;
+    max-height: 6rem;
+  }
+  .wishlist-table-img {
     width: auto;
     max-width: 6rem;
     max-height: 6rem;

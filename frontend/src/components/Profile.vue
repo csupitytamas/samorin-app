@@ -53,6 +53,13 @@
                class="wishlist-line">
             {{ lang === 'hu' ? pole.pole_name_hu : pole.pole_name_en }}
             ({{ pole.pole_color }}, {{ pole.pole_length }}m) – x{{pole.quantity }}
+            <img
+            v-if="pole.pole_picture"
+            :src="fullImageUrl(pole.pole_picture)"
+            class="mini-pole-img"
+            alt="Pole"
+            @click="showImage(fullImageUrl(pole.pole_picture))"
+          />
           </div>
         </div>
       </div>
@@ -65,13 +72,25 @@
                class="wishlist-line">
             {{ lang === 'hu' ? wing.wing_name_hu : wing.wing_name_en }}
             ({{ wing.wing_color }}) –  x{{wing.quantity }}
+            <img
+              v-if="wing.wing_picture"
+              :src="fullImageUrl(wing.wing_picture)"
+              class="mini-pole-img"
+              alt="Wing"
+              @click="showImage(fullImageUrl(wing.wing_picture))"
+            />
           </div>
           </div>
        </div>
       </div>
      </div>
     </div>
+    <div v-if="fullscreenImage" class="image-modal" @click.self="fullscreenImage = null">
+      <img :src="fullscreenImage" alt="Full image" />
+      <button class="modal-close-btn" @click="fullscreenImage = null">{{ t('close') }}</button>
+    </div>
   </div>
+
 </template>
 
 <script>
@@ -85,6 +104,7 @@ export default {
     return {
       profile: null,
       wishlists: [],
+        fullscreenImage: null,
     }
   },
   computed: {
@@ -112,7 +132,13 @@ export default {
     formatDateTime(datetime) {
       if (!datetime) return ''
       return new Date(datetime).toLocaleString()
-    }
+    },
+     showImage(url) { this.fullscreenImage = url },
+    fullImageUrl(path) {
+    if (!path) return ""
+    if (path.startsWith("http")) return path
+    return "http://13.48.70.78:8000" + path
+  }
   }
 }
 </script>

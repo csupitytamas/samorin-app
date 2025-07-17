@@ -130,8 +130,17 @@ export default {
     alreadyAccount: "Már van fiókod?",
     loginHere: "Jelentkezz be itt!",
     selectedItems: "Kiválasztott tételek",
-
-
+     inMode: "Be (Raktárból)",
+    outMode: "Ki (Pályáról)",
+    chooseFromItems: "Válassz az elérhető tételekből",
+    warehouseIn: "Be (raktárból)",
+    arenaOut: "Ki (arénába)",
+    noInItems: "Nincs bejövő tétel",
+    noOutItems: "Nincs kimenő tétel",
+    close: "Bezárás",
+    warehouseOut: "Ki (pályáról)",
+    confirmDeleteWishlist: "Biztosan törlöd a kívánságlistát?",
+    wishlistDeleted: "Kívánságlista törölve!",
 
   },
   en: {
@@ -262,6 +271,17 @@ export default {
     alreadyAccount: "Already have an account?",
     loginHere: "Login here!",
     selectedItems: "Selected items",
-
+    inMode: "In (from Warehouse)",
+    outMode: "Out (from Arena)",
+    chooseFromItems: "Choose from available items",
+    warehouseIn: "In (from Warehouse)",
+    arenaOut: "Out (to Arena)",
+    noInItems: "No incoming items",
+    noOutItems: "No outgoing items",
+    close: "Close",
+    warehouseOut: "Out (from Arena)",
+    confirmDeleteWishlist: "Are you sure you want to delete the wishlist?" ,
+    wishlistDeleted: "Wishlist deleted!",
   }
+
 }
