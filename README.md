@@ -11,7 +11,7 @@ A full-stack solution for managing:
 Built with:
 
     -Django + PostgreSQL (backend)
-    -Vue 3 (frontend SPA)
+    -Vue 2 (frontend SPA)
 
 Deployed on AWS:
 
