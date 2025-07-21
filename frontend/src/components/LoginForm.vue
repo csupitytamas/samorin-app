@@ -35,6 +35,7 @@
 import { loginUser, fetchProfile } from "@/api/api"
 import { mapState } from "vuex"
 import translations from "@/translations"
+import localforage from 'localforage';
 
 export default {
   name: 'LoginForm',
@@ -53,27 +54,30 @@ export default {
     }
   },
   methods: {
-    async handleLogin() {
-      this.error = ''
-      try {
-        const res = await loginUser({
-          username: this.username,
-          password: this.password,
-        })
-        if (this.rememberMe) {
-          localStorage.setItem('access_token', res.data.access)
-          localStorage.setItem('refresh_token', res.data.refresh)
-        } else {
-          sessionStorage.setItem('access_token', res.data.access)
-          sessionStorage.setItem('refresh_token', res.data.refresh)
+          async handleLogin() {
+        this.error = ''
+        try {
+          const res = await loginUser({
+            username: this.username,
+            password: this.password,
+          })
+          // Szerezzük ki a tokeneket
+          const accessToken = res.data.access;
+          const refreshToken = res.data.refresh;
+          if (this.rememberMe) {
+            await localforage.setItem('access_token', accessToken);
+            await localforage.setItem('refresh_token', refreshToken);
+          } else {
+            sessionStorage.setItem('access_token', accessToken)
+            sessionStorage.setItem('refresh_token', refreshToken)
+          }
+          const user = await fetchProfile()
+          this.$store.dispatch('setUser', user)
+          this.$router.push({ name: 'event-list' })
+        } catch (err) {
+          this.error = this.t('invalidLogin') || 'Invalid login credentials!'
         }
-        const user = await fetchProfile()
-        this.$store.dispatch('setUser', user)
-        this.$router.push({ name: 'event-list' })
-      } catch (err) {
-        this.error = this.t('invalidLogin') || 'Invalid login credentials!'
-      }
-    },
+      },
   }
 }
 </script>

@@ -1,46 +1,42 @@
 import axios from 'axios'
+import localforage from 'localforage';
 
 // TOKEN INTERCEPTORS
-axios.interceptors.request.use(config => {
-  const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token')
+axios.interceptors.request.use(async config => {
+  const token = await localforage.getItem('access_token');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+    config.headers.Authorization = `Bearer ${token}`;
   }
-  return config
-})
+  return config;
+});
 
 axios.interceptors.response.use(
   response => response,
   async error => {
-    const originalRequest = error.config
+    const originalRequest = error.config;
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-      const refreshToken = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token')
+      originalRequest._retry = true;
+      const refreshToken = await localforage.getItem('refresh_token');
       if (refreshToken) {
         try {
-          const res = await axios.post('/api/token/refresh/', { refresh: refreshToken })
-          const newAccess = res.data.access
-          if (localStorage.getItem('refresh_token')) {
-            localStorage.setItem('access_token', newAccess)
-          } else {
-            sessionStorage.setItem('access_token', newAccess)
-          }
-          originalRequest.headers['Authorization'] = `Bearer ${newAccess}`
-          return axios(originalRequest)
+          const res = await axios.post('/api/token/refresh/', { refresh: refreshToken });
+          const newAccess = res.data.access;
+          await localforage.setItem('access_token', newAccess);
+          originalRequest.headers['Authorization'] = `Bearer ${newAccess}`;
+          return axios(originalRequest);
         } catch {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
-          sessionStorage.removeItem('access_token')
-          sessionStorage.removeItem('refresh_token')
-          window.location.href = '/login'
+          await localforage.removeItem('access_token');
+          await localforage.removeItem('refresh_token');
+          window.location.href = '/login';
         }
       } else {
-        window.location.href = '/login'
+        window.location.href = '/login';
       }
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
+
 
 const API_BASE = process.env.NODE_ENV === 'production'
   ? 'http://13.48.70.78:8000/api/'

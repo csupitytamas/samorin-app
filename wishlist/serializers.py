@@ -7,21 +7,23 @@ class WishlistPoleItemSerializer(serializers.ModelSerializer):
     pole_name_hu = serializers.CharField(source='pole.name_hu', read_only=True)
     pole_color = serializers.CharField(source='pole.color', read_only=True)
     pole_length = serializers.FloatField(source='pole.length', read_only=True)
+    pole_picture = serializers.ImageField(source='pole.picture', read_only=True)
     mode = serializers.CharField()
 
     class Meta:
         model = WishlistPoleItem
-        fields = ['id', 'pole', 'quantity', 'mode', 'pole_name_en', 'pole_name_hu', 'pole_color', 'pole_length']
+        fields = ['id', 'pole', 'quantity', 'mode', 'pole_name_en', 'pole_name_hu', 'pole_color', 'pole_length', 'pole_picture' ]
 
 class WishlistWingItemSerializer(serializers.ModelSerializer):
     wing_name_en = serializers.CharField(source='wing.name_en', read_only=True)
     wing_name_hu = serializers.CharField(source='wing.name_hu', read_only=True)
     wing_color = serializers.CharField(source='wing.color', read_only=True)
+    wing_picture = serializers.ImageField(source='wing.picture', read_only=True)
     mode = serializers.CharField()
 
     class Meta:
         model = WishlistWingItem
-        fields = ['id', 'wing', 'quantity', 'mode', 'wing_name_en', 'wing_name_hu', 'wing_color']
+        fields = ['id', 'wing', 'quantity', 'mode', 'wing_name_en', 'wing_name_hu', 'wing_color', 'wing_picture']
 
 class WishlistSerializer(serializers.ModelSerializer):
     pole_items = WishlistPoleItemSerializer(many=True, read_only=True)

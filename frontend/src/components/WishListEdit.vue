@@ -280,10 +280,8 @@ export default {
     gridType() { this.gridCurrentPage = 1 },
     gridLength() { this.gridCurrentPage = 1 },
     viewMode(newVal) {
-      // Ha OUT módra váltunk, töltsük be újra az aréna elemeket (ha kell)
-      if (newVal === 'out' && this.wishlist?.arena_id) {
-        this.loadArenaItems(this.wishlist.arena_id);
-        console.log("Arena items újratöltve OUT módban:", this.arenaItems);
+      if (newVal === 'out' && this.wishlist?.arena) {
+        this.loadArenaItems(this.wishlist.arena);
       }
     }
   },
@@ -311,11 +309,9 @@ export default {
           mode: w.mode || 'in'
         }))
       ]
-       if (this.wishlist.arena_id) {
-         await this.loadArenaItems(this.wishlist.arena_id);
+       if (this.wishlist.arena) {
+         await this.loadArenaItems(this.wishlist.arena);
       }
-      console.log("arenaItems betöltve:", this.arenaItems)
-      console.log("wishlistItems betöltve:", this.wishlistItems)
     } catch (err) {
       this.errorMessage = this.t('couldNotLoadWishlist') || "Could not load wishlist"
     }
@@ -327,8 +323,6 @@ export default {
     fetchPoleLocationsByArena(arenaId),
     fetchWingLocationsByArena(arenaId)
   ]);
-    console.log("poleRes:", poleRes);
-  console.log("wingRes:", wingRes);
   this.arenaItems = [
     ...poleRes.data.map(p => ({
       id: p.pole?.id,
@@ -354,7 +348,6 @@ export default {
       number: w.quantity
     }))
   ];
-   console.log("arenaItems:", this.arenaItems);
 },
     fullImageUrl(path) {
       if (!path) return ""
