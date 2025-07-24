@@ -157,3 +157,18 @@ export function fetchActiveArenas() {
 export function deleteWishlist(id) {
   return axios.delete(API_BASE + `wishlist/${id}/`);
 }
+export function deletePole(id) {
+  return axios.delete(API_BASE + `poles/${id}/`)
+}
+export function deleteWings(id) {
+  return axios.delete(API_BASE + `wings/${id}/`)
+}
+export function updatePole(id, data) {
+  // data lehet FormData (ha képet is küldesz)
+  return axios.patch(API_BASE + `poles/${id}/`, data)
+}
+
+export function updateWings(id, data) {
+  // data lehet FormData (ha képet is küldesz)
+  return axios.patch(API_BASE + `wings/${id}/`, data)
+}

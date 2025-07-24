@@ -19,7 +19,9 @@
       <div class="wishlist-header">
         <div style="display:flex; align-items:center;">
           <span @click="removeItemFromWishlist(item)" class="trash-button">×</span>
-          <img v-if="item.picture" :src="fullImageUrl(item.picture)" class="table-image" style="margin-left:0.8rem;">
+          <img v-if="item.picture" :src="fullImageUrl(item.picture)"
+             class="table-image small-image clickable-image"
+             @click.stop="fullscreenImage = fullImageUrl(item.picture)" style="margin-left:0.8rem;">
           <div style="margin-left:0.8rem;">
             <b>{{ lang === 'hu' ? item.name_hu : item.name_en }}</b>
             <div style="font-size:var(--font-size-s); color:var(--muted-color);">
@@ -44,7 +46,9 @@
       <div class="wishlist-header">
         <div style="display:flex; align-items:center;">
           <span @click="removeItemFromWishlist(item)" class="trash-button">×</span>
-          <img v-if="item.picture" :src="fullImageUrl(item.picture)" class="table-image" style="margin-left:0.8rem;">
+          <img v-if="item.picture" :src="fullImageUrl(item.picture)"
+             class="table-image small-image clickable-image"
+             @click.stop="fullscreenImage = fullImageUrl(item.picture)" style="margin-left:0.8rem;">
           <div style="margin-left:0.8rem;">
             <b>{{ lang === 'hu' ? item.name_hu : item.name_en }}</b>
             <div style="font-size:var(--font-size-s); color:var(--muted-color);">
@@ -133,12 +137,16 @@
           {{ t('stock') }}: {{ item.number }}
         </div>
         <div v-if="gridSelected.includes(item.type + '-' + item.id)" style="margin-top:5px;">
-          <input type="number" :max="item.number" min="1"
-                 v-model.number="gridQuantities[item.type + '-' + item.id]"
-                 :placeholder="`Max: ${item.number}`"
-                 style="width:60px; background:var(--bg-color); color:var(--text-color);
-                        border:1px solid rgba(255,255,255,0.15); border-radius:var(--border-radius);
-                        padding:var(--padding-s);">
+        <input
+        type="number"
+        :max="item.number"
+        min="1"
+        v-model.number="gridQuantities[item.type + '-' + item.id]"
+        :placeholder="`Max: ${item.number}`"
+        @click.stop
+        @mousedown.stop
+        style="width:60px; background:var(--bg-color);
+        color:var(--text-color); border:1px solid rgba(255,255,255,0.15); border-radius:var(--border-radius); padding:var(--padding-s);">
         </div>
       </div>
     </div>
@@ -177,7 +185,10 @@
    <div v-if="popupMessage" class="popup-modal">
       {{ popupMessage }}
     </div>
-
+    <div v-if="fullscreenImage" class="image-modal" @click.self="fullscreenImage = null">
+      <img :src="fullscreenImage" alt="Full image" />
+      <button class="modal-close-btn" @click="fullscreenImage = null">{{ t('close') }}</button>
+    </div>
   </div>
 </template>
 
@@ -217,6 +228,7 @@ export default {
       viewMode: 'in',
       arenaItems: [],
       popupMessage: "",
+
     }
   },
   computed: {

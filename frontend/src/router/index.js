@@ -82,7 +82,22 @@ const routes = [
     component: EventWishlists,
     props: true,
     meta: { requiresAuth: true, crewOrChiefOrAdmin: true }
-  }
+  },
+        {
+      path: '/admin/pole/:id/edit',
+      name: 'pole-edit',
+      component: () => import('@/components/EditPole.vue'),
+      props: true,
+      meta: { requiresAuth: true, adminOnly: true }
+    },
+    {
+      path: '/admin/wings/:id/edit',
+      name: 'wings-edit',
+      component: () => import('@/components/EditWings.vue'),
+      props: true,
+      meta: { requiresAuth: true, adminOnly: true }
+    },
+
 ]
 
 const router = createRouter({

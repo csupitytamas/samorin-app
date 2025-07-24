@@ -718,7 +718,111 @@ button:hover {
   gap: 1.2rem;
   transition: box-shadow 0.18s, background 0.18s;
 }
+.pole-edit-modal {
+  min-width: 0;
+  width: 97vw;
+  max-width: 400px;
+  padding: var(--padding-m) var(--padding-m) var(--padding-m) var(--padding-m);
+  position: relative;
+  margin: 0 auto;
+}
+.pole-edit-img {
+  max-width: 100%;
+  max-height: 90px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 0 1rem var(--accent-color, #00d1b2);
+}
+.close-x {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 5;
+  background: var(--accent-color);
+  color: var(--bg-color);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 2px 8px #0002;
+  transition: background .15s;
+}
+.close-x:hover {
+  background: #ff3860;
+  color: #fff;
+}
+.modal-centered-box {
+  background: var(--surface-color, #1e1e1e);
+  border-radius: var(--border-radius, 0.5rem);
+  box-shadow: 0 0 32px 0 rgba(0,209,178,0.4), 0 0 0 4px var(--accent-color, #00d1b2);
+  max-width: 420px;
+  width: 94vw;
+  margin: 0 auto;
+  padding: 1.4rem 1rem 1rem 1rem;
+  position: relative;
+  z-index: 10001;
+  animation: fadeInModal .15s;
+}
 
+select.accent-button {
+  background-color: var(--accent-color);
+  color: #191919;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-weight: bold;
+  cursor: pointer;
+  appearance: none;
+  text-align: center;
+}
+
+.accent-button {
+  background-color: #00d1b2;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.tiny-icon-button {
+  background: none;
+  border: none;
+  padding: 0.2rem;
+  font-size: 1rem;
+  line-height: 1;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.tiny-icon-button:hover {
+  color: #fff;
+}
+
+.tiny-icon-button.danger {
+  color: #e74c3c;
+}
+
+.tiny-icon-button.danger:hover {
+  color: #ff6b5c;
+}
+@media (max-width: 600px) {
+  .modal-centered-box {
+    max-width: 98vw;
+    padding: 0.8rem 0.4rem 0.8rem 0.4rem;
+  }
+}
+@keyframes fadeInModal {
+  from { opacity: 0; transform: scale(0.95);}
+  to   { opacity: 1; transform: scale(1);}
+}
 
 
 @keyframes fadeInOut {
