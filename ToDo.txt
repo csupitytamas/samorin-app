@@ -1,0 +1,15 @@
+JumpDepo:
+Gyorsaság és megbízhatóbb működés
+Szín adattag kitörlése az appból
+Archiváló job - dátum alapján
+Wishlist pályák szűrése
+Keep me logged"
+Archivált versenyek lista nézete
+Admin felület képei
+Kőfal/alátétek oszlop és szűrés
+Admin felület szűrés
+Lapozható oldalak
+Verseny helyszín szerint
+Refactorálás, teljesítmény op.
+Dokumentáció
+Andorid application ?!
